@@ -1,0 +1,12 @@
+*
+
+!.gitignore
+!.gitmodule
+!CMakeLists.txt
+
+!externals/
+!externals/**/*
+
+!editor/
+!editor/**/*
+
