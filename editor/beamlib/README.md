@@ -1,6 +1,6 @@
 # beamlib
 
-A lightweight wrapper for glfw window creation & imgui that has raylib-like api.
+A lightweight wrapper for glfw & imgui that has raylib-like api.
 
 ## quick start
 
