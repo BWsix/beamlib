@@ -7,17 +7,14 @@ in vec3 FragPos;
 
 out vec4 FragColor;
 
-vec3 ambient = vec3(0.1, 0.1, 0.1);
+vec3 ambient = vec3(0.3);
 
 void main() {
     vec3 viewDir = -FragPos;
     vec3 reflectDir = reflect(LightDir, NormalDir);
 
     float diffuseIntensity = max(0.0, dot(-LightDir, NormalDir));
-    vec3 diffuse = 0.4 * vec3(diffuseIntensity);
+    vec3 diffuse = 0.6 * vec3(diffuseIntensity);
 
-    float specularIntensity = pow(max(0.0, dot(reflectDir, viewDir)), 128.0f);
-    vec3 specular = 0.2 * vec3(specularIntensity);
-
-    FragColor = vec4(lightColor * (ambient + diffuse + specular), 1.0);
+    FragColor = vec4((ambient + diffuse) * lightColor , 1.0);
 }

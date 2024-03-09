@@ -7,6 +7,9 @@ add_subdirectory(glfw)
 # glm
 add_subdirectory(glm)
 
+# json
+add_subdirectory(json)
+
 # imgui
 add_library(imgui
     imgui/imconfig.h

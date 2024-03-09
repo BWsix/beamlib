@@ -1,3 +1,5 @@
+#pragma once
+
 #include <beamlib.h>
 
 const float cube_vertices[] = {
@@ -45,14 +47,13 @@ const float cube_vertices[] = {
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
 };
 
-class Cube {
+
+class Cube : public beamlib::Object {
     GLuint vbo;
     GLuint vao;
 
 public:
-    beamlib::ShaderProgram shaderProgram = {"editor/shaders/cube.vert.glsl", "editor/shaders/cube.frag.glsl"};
-
-    Cube() {
+    Cube(beamlib::ShaderProgram program) : Object(program) {
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
@@ -68,26 +69,40 @@ public:
         glEnableVertexAttribArray(2);
     }
 
-    void Update() {
+    void Update() override {
         shaderProgram.Use();
         shaderProgram.setUniformMat4("view", beamlib::camera.getViewMatrix());
         shaderProgram.setUniformMat4("projection", beamlib::camera.getProjectionMatrix());
     }
 
-    void Render() {
+    void Render() override {
         shaderProgram.Use();
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, sizeof(cube_vertices));
     }
 };
 
-class CubeInstance : public beamlib::Instance<Cube> {
+class CubeInstance : public beamlib::Instance {
 public:
-    glm::vec3 color;
+    glm::vec3 color = {1, 1, 1};
 
-    CubeInstance(Cube *object, std::string name) : Instance<Cube>(object, name) {}
+    CubeInstance(Cube *object, std::string name) : Instance(object, name) {}
+
+    json CustomSerialize() override {
+        return {
+            {"color", beamlib::toVector(color)},
+        };
+    }
+
+    void CustomLoad(json j) override {
+        color = beamlib::vectorToVec3(j["color"]);
+    }
 
     void CustomRender() override {
         object->shaderProgram.setUniformVec3("lightColor", color);
+    }
+
+    void CustomRenderUI() override {
+        ImGui::ColorEdit3(("color##" + name).c_str(), glm::value_ptr(color), ImGuiColorEditFlags_Float);
     }
 };

@@ -7,3 +7,6 @@
 [submodule "externals/glm"]
 	path = externals/glm
 	url = https://github.com/g-truc/glm
+[submodule "externals/json"]
+	path = externals/json
+	url = https://github.com/nlohmann/json.git

@@ -13,6 +13,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 namespace beamlib {
 Mouse mouse;
@@ -92,16 +94,30 @@ void beamlib::EndUI() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-double beamlib::getTimeElapsed() {
-    return glfwGetTime();
-}
+double beamlib::getTimeElapsed() { return glfwGetTime(); }
+float beamlib::getFrameRate() { return ImGui::GetIO().Framerate; }
+float beamlib::getDeltaTime() { return ImGui::GetIO().DeltaTime; }
 
-float beamlib::getFrameRate() {
-    return ImGui::GetIO().Framerate;
+void beamlib::dbg(glm::vec3 vec) { std::cout << vec[0] << ' ' << vec[1] << ' ' << vec[2] << '\n'; }
+void beamlib::dbg(glm::quat q) { std::cout << q[0] << ' ' << q[1] << ' ' << q[2] << ' ' << q[3] << '\n'; }
+void beamlib::dbg(glm::mat4 mat) { for (size_t i = 0; i < 4; i++) std::cout << mat[i][0] << ' ' << mat[i][1] << ' ' << mat[i][2] << ' ' << mat[i][3] << '\n'; }
+std::vector<float> beamlib::toVector(glm::vec3 data) { return std::vector<float>{data[0], data[1], data[2]}; }
+std::vector<float> beamlib::toVector(glm::quat data) { return std::vector<float>{data[0], data[1], data[2], data[3]}; }
+std::vector<float> beamlib::toVector(glm::mat4 data) {
+    std::vector<float> v(16);
+    for (size_t i = 0; i < 16; i++) v[i] = glm::value_ptr(data)[i];
+    return v;
 }
-
-float beamlib::getDeltaTime() {
-    return ImGui::GetIO().DeltaTime;
+glm::vec3 beamlib::vectorToVec3(std::vector<float> data) { return glm::vec3(data[0], data[1], data[2]); }
+glm::quat beamlib::vectorToQuat(std::vector<float> data) {
+    glm::quat quat;
+    for (size_t i = 0; i < 4; i++) { glm::value_ptr(quat)[i] = data[i]; }
+    return quat;
+}
+glm::mat4 beamlib::vectorToMat4(std::vector<float> data) {
+    glm::mat4 m;
+    for (size_t i = 0; i < 16; i++) glm::value_ptr(m)[i] = data[i];
+    return m;
 }
 
 void beamlib::Mouse::Update(GLFWwindow *window) {
@@ -144,17 +160,25 @@ void beamlib::Transform::RenderUI(std::string name) {
     ImGui::DragFloat3(("position##" + name).c_str(), glm::value_ptr(position), 0.05);
     ImGui::DragFloat3(("scale##" + name).c_str(), glm::value_ptr(scale), 0.05);
 
-    glm::vec3 rotation = getRotationEuler();
-    ImGui::DragFloat3(("rotation##" + name).c_str(), glm::value_ptr(rotation), 0.05);
-    setRotationEuler(rotation);
+    glm::vec3 newRotation = getRotationEuler();
+    ImGui::DragFloat3(("rotation##" + name).c_str(), glm::value_ptr(newRotation), 0.05);
+    glm::vec3 deltaRotation = newRotation - getRotationEuler();
+    Rotate(glm::angleAxis(deltaRotation[0], glm::vec3(1, 0, 0)));
+    Rotate(glm::angleAxis(deltaRotation[1], glm::vec3(0, 1, 0)));
+    Rotate(glm::angleAxis(deltaRotation[2], glm::vec3(0, 0, 1)));
 
-    glm::vec3 localRotation = getLocalRotationEuler();
-    ImGui::DragFloat3(("localRotation##" + name).c_str(), glm::value_ptr(localRotation), 0.05);
-    setLocalRotationEuler(localRotation);
+    glm::vec3 newLocalRotation = getLocalRotationEuler();
+    ImGui::DragFloat3(("localRotation##" + name).c_str(), glm::value_ptr(newLocalRotation), 0.05);
+    glm::vec3 deltaLocalRotation = newLocalRotation - getLocalRotationEuler();
+    RotateLocal(glm::angleAxis(deltaLocalRotation[0], glm::vec3(1, 0, 0)));
+    RotateLocal(glm::angleAxis(deltaLocalRotation[1], glm::vec3(0, 1, 0)));
+    RotateLocal(glm::angleAxis(deltaLocalRotation[2], glm::vec3(0, 0, 1)));
 }
 
+// TODO: implement `object lock`
 void beamlib::Camera::Update(GLFWwindow* window) {
     if (beamlib::mouse.getRightButtonPressed()) {
+        // TODO: change to euler based
         yaw += sensitivity * beamlib::mouse.getDeltaRight().x;
         pitch -= sensitivity * beamlib::mouse.getDeltaRight().y;
         if (pitch > 89.0f) {
