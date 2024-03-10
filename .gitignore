@@ -3,6 +3,7 @@
 !.gitignore
 !.gitmodule
 !CMakeLists.txt
+!README.md
 
 !externals/
 !externals/**/*

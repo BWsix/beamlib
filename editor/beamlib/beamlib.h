@@ -61,11 +61,6 @@ public:
     glm::mat4 getModelMatrix() const;
     glm::mat4 getModelMatrixForChildren() const;
 
-    void setRotationEuler(glm::vec3 euler) { 
-        Rotate(glm::angleAxis(euler[0], glm::vec3(1, 0, 0)));
-    }
-    void setLocalRotationEuler(glm::vec3 euler) { localRotationQuat = glm::quat(euler); }
-
     void RenderUI(std::string name);
     json SerializeModel() {
         return {
