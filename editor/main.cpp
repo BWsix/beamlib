@@ -48,7 +48,15 @@ int main() {
         root.Render();
 
         beamlib::BeginUI();
+
+        ImGui::Begin("Info", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Text("fps: %.0f", beamlib::getFrameRate());
+        ImGui::Text("frametime: %f", beamlib::getDeltaTime());
+        ImGui::End();
+
+        ImGui::Begin("Object hierarchy");
         root.RenderUI();
+        ImGui::End();
         beamlib::EndUI();
     }
 
