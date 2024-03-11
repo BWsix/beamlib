@@ -98,6 +98,12 @@ public:
         color = beamlib::vectorToVec3(j["color"]);
     }
 
+    json CustomInterpolator(json from, json to, float progress) override {
+        return {
+            {"color", beamlib::toVector(beamlib::lerp(beamlib::vectorToVec3(from["color"]), beamlib::vectorToVec3(to["color"]), progress))},
+        };
+    }
+
     void CustomRender() override {
         store::cubeProgram.Use();
         store::cubeProgram.setUniformMat4("model", transform.getModelMatrix());

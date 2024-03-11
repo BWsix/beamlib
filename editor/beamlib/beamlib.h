@@ -39,9 +39,14 @@ glm::vec3 vectorToVec3(std::vector<float> data);
 glm::quat vectorToQuat(std::vector<float> data);
 glm::mat4 vectorToMat4(std::vector<float> data);
 
+template<typename T>
+T lerp(T from, T to, float progress) {
+    return (1.0f - progress) * from + progress * to;
+}
+
 class Transform {
     Transform *parent = NULL;
-    glm::vec3 localPosition = {0, 0, 0};
+    glm::vec3 position = {0, 0, 0};
     glm::quat rotationQuat = glm::angleAxis(0.0f, glm::vec3({0, 1, 0}));
     glm::quat localRotationQuat = glm::angleAxis(0.0f, glm::vec3({0, 1, 0}));
     glm::vec3 scale = {1, 1, 1};
@@ -49,14 +54,14 @@ class Transform {
 public:
     void setParent(Transform *transform) { parent = transform; }
 
-    void Translate(glm::vec3 offset) { localPosition += offset; }
+    void Translate(glm::vec3 offset) { position += offset; }
     void Rotate(glm::quat quat) { rotationQuat *= quat; }
     void RotateLocal(glm::quat quat) { localRotationQuat *= quat; }
     void RotateLocal(glm::vec3 euler) { Rotate(glm::quat(euler)); }
     void Scale(glm::vec3 scale) { scale *= scale; }
 
-    glm::vec3 getPosition() const { return rotationQuat * (parent ? parent->getPosition() + localPosition : localPosition); }
-    glm::vec3 getLocalPosition() const { return localPosition; }
+    glm::vec3 getPosition() const { return rotationQuat * (parent ? parent->getPosition() + position : position); }
+    glm::vec3 getLocalPosition() const { return position; }
     glm::vec3 getRotationEuler() const { return glm::eulerAngles(rotationQuat); }
     glm::vec3 getLocalRotationEuler() const { return glm::eulerAngles(localRotationQuat); }
     glm::quat getLocalRotationQuat() const { return localRotationQuat; }
@@ -65,7 +70,7 @@ public:
         glm::mat4 parentModel = parent ? parent->getModelMatrixForChildren() : glm::mat4(1);
         return parentModel
         * glm::toMat4(rotationQuat) 
-        * glm::translate(model, localPosition)
+        * glm::translate(model, position)
         * glm::toMat4(localRotationQuat)
         * glm::scale(model, scale);
     }
@@ -73,23 +78,31 @@ public:
         glm::mat4 parentModel = parent ? parent->getModelMatrixForChildren() : glm::mat4(1);
         return parentModel
         * glm::toMat4(rotationQuat) 
-        * glm::translate(glm::mat4(1), localPosition);
+        * glm::translate(glm::mat4(1), position);
     }
 
     void RenderUI(std::string name);
     json SerializeModel() {
         return {
-            {"position", toVector(localPosition)},
+            {"position", toVector(position)},
             {"rotationQuat", toVector(rotationQuat)},
             {"localRotationQuat", toVector(localRotationQuat)},
             {"scale", toVector(scale)},
         };
     }
     void LoadModel(json j) {
-        localPosition = vectorToVec3(j["position"]);
+        position = vectorToVec3(j["position"]);
         rotationQuat = vectorToQuat(j["rotationQuat"]);
         localRotationQuat = vectorToQuat(j["localRotationQuat"]);
         scale = vectorToVec3(j["scale"]);
+    }
+    json Interpolator(json from, json to, float progress) {
+        return {
+            {"position", toVector(lerp(vectorToVec3(from["position"]), vectorToVec3(to["position"]), progress))},
+            {"rotationQuat", toVector(glm::slerp(vectorToQuat(from["rotationQuat"]), vectorToQuat(to["rotationQuat"]), progress))},
+            {"localRotationQuat", toVector(glm::slerp(vectorToQuat(from["localRotationQuat"]), vectorToQuat(to["localRotationQuat"]), progress))},
+            {"scale", toVector(lerp(vectorToVec3(from["scale"]), vectorToVec3(to["scale"]), progress))},
+        };
     }
 };
 
@@ -164,13 +177,31 @@ public:
         return j;
     }
 
-    virtual void CustomLoad(json j) {}
+    virtual void CustomLoad(json j) { (void)j; }
     void Load(json j) {
         transform.LoadModel(j["transform"]);
         if (!j["data"].is_null()) {
             CustomLoad(j["data"]);
         }
-        for (size_t i = 0; i < children.size(); i++) children[i]->Load(j["children"][i]);
+        for (size_t i = 0; i < children.size(); i++) {
+            children[i]->Load(j["children"][i]);
+        }
+    }
+
+    virtual json CustomInterpolator(json from, json to, float progress) {
+        (void)from; (void)to; (void)progress;
+        return {};
+    }
+    json Interpolator(json from, json to, float progress) {
+        json j;
+        j["name"] = from["name"];
+        j["transform"] = transform.Interpolator(from["transform"], to["transform"], progress);
+        j["children"] = json::array();
+        j["data"] = CustomInterpolator(from["data"], to["data"], progress);
+        for (size_t i = 0; i < children.size(); i++) {
+            j["children"].emplace_back(children[i]->Interpolator(from["children"][i], to["children"][i], progress));
+        }
+        return j;
     }
 
     virtual void CustomUpdate() {}
@@ -261,6 +292,8 @@ public:
     void Update() override;
 
     void CustomRenderUI() override {
+        ImGui::DragFloat(("pitch##" + name).c_str(), &pitch, 0.1);
+        ImGui::DragFloat(("yaw##" + name).c_str(), &yaw, 0.1);
         if (!isFirstPersonMode()) {
             ImGui::DragFloat(("radius##" + name).c_str(), &radius, 0.2);
             if (ImGui::Button(("Go Back To First Person Mode##" + name).c_str())) {
@@ -276,7 +309,7 @@ public:
             {"yaw", yaw},
             {"pitch_prev", pitch_prev},
             {"yaw_prev", yaw_prev},
-            {"target", targetInstance->name},
+            {"target", targetInstance ? targetInstance->name : ""},
         };
     }
 
@@ -286,7 +319,18 @@ public:
         yaw = j["yaw"];
         pitch_prev = j["pitch_prev"];
         yaw_prev = j["yaw_prev"];
-        targetInstance = instanceStore.at(j["target"]);
+        targetInstance = j["target"] != "" ? instanceStore.at(j["target"]) : NULL;
+    }
+
+    json CustomInterpolator(json from, json to, float progress) override {
+        return {
+            {"radius", beamlib::lerp(float(from["radius"]), float(to["radius"]), progress)},
+            {"pitch", beamlib::lerp(float(from["pitch"]), float(to["pitch"]), progress)},
+            {"yaw", beamlib::lerp(float(from["yaw"]), float(to["yaw"]), progress)},
+            {"pitch_prev", beamlib::lerp(float(from["pitch_prev"]), float(to["pitch_prev"]), progress)},
+            {"yaw_prev", beamlib::lerp(float(from["yaw_prev"]), float(to["yaw_prev"]), progress)},
+            {"target", from["target"]},
+        };
     }
 };
 extern Camera camera;

@@ -140,7 +140,7 @@ void beamlib::Mouse::Update(GLFWwindow *window) {
 }
 
 void beamlib::Transform::RenderUI(std::string name) {
-    ImGui::DragFloat3(("position##" + name).c_str(), glm::value_ptr(localPosition), 0.05);
+    ImGui::DragFloat3(("position##" + name).c_str(), glm::value_ptr(position), 0.05);
     ImGui::DragFloat3(("scale##" + name).c_str(), glm::value_ptr(scale), 0.05);
 
     glm::vec3 newRotation = getRotationEuler();
