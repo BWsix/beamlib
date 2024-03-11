@@ -2,6 +2,8 @@
 
 #include <beamlib.h>
 
+#include "shaderProgramStore.h"
+
 const float star_vertices_front[] = {
     // position      // brightness
     0.0,  0.0, 0.3, 1.0, // front
@@ -39,7 +41,7 @@ class Star : public beamlib::Object {
     GLuint vao_star_front, vao_star_back;
 
 public:
-    Star(beamlib::ShaderProgram program) : Object(program) {
+    Star() {
         float stride = 4 * sizeof(float);
 
         glGenBuffers(1, &vbo_star_front);
@@ -63,14 +65,13 @@ public:
         glEnableVertexAttribArray(1);
     }
 
-    void Update() override {
-        shaderProgram.Use();
-        shaderProgram.setUniformMat4("view", beamlib::camera.getViewMatrix());
-        shaderProgram.setUniformMat4("projection", beamlib::camera.getProjectionMatrix());
-    }
+    void Update() override {}
 
     void Render() override {
-        shaderProgram.Use();
+        store::starProgram.Use();
+        store::starProgram.setUniformMat4("view", beamlib::camera.getViewMatrix());
+        store::starProgram.setUniformMat4("projection", beamlib::camera.getProjectionMatrix());
+
         glBindVertexArray(vao_star_front);
         glDrawArrays(GL_TRIANGLE_FAN, 0, sizeof(star_vertices_front) / 4);
         glBindVertexArray(vao_star_back);
@@ -82,7 +83,7 @@ class StarInstance : public beamlib::Instance {
 public:
     glm::vec3 color = {1, 1, 1};
 
-    StarInstance(Star *object, std::string name) : Instance(object, name) {}
+    StarInstance(beamlib::Object *object, std::string name) : Instance(object, name) {}
 
     json CustomSerialize() override {
         return {
@@ -95,10 +96,15 @@ public:
     }
 
     void CustomRender() override {
-        object->shaderProgram.setUniformVec3("lightColor", color);
+        store::starProgram.Use();
+        store::starProgram.setUniformMat4("model", transform.getModelMatrix());
+        store::starProgram.setUniformVec3("lightColor", color);
     }
 
     void CustomRenderUI() override {
         ImGui::ColorEdit3(("color##" + name).c_str(), glm::value_ptr(color), ImGuiColorEditFlags_Float);
+        if (ImGui::Button(("focus##" + name).c_str())) {
+            beamlib::camera.setTargetInstance(this);
+        }
     }
 };

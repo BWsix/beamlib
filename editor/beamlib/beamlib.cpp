@@ -18,7 +18,8 @@ using json = nlohmann::json;
 
 namespace beamlib {
 Mouse mouse;
-Camera camera;
+Camera camera(NULL, "CAMERA");
+std::map<std::string, Instance*> instanceStore;
 }
 
 GLFWwindow *beamlib::CreateWindow(const char *title, int width, int height) {
@@ -69,7 +70,6 @@ GLFWwindow *beamlib::CreateWindow(const char *title, int width, int height) {
 bool beamlib::WindowShouldClose(GLFWwindow *window) {
     glfwPollEvents();
     glfwSwapBuffers(window);
-    camera.Update(window);
     mouse.Update(window);
     return glfwWindowShouldClose(window);
 }
@@ -139,25 +139,8 @@ void beamlib::Mouse::Update(GLFWwindow *window) {
     }
 }
 
-glm::mat4 beamlib::Transform::getModelMatrix() const {
-    glm::mat4 model(1);
-    glm::mat4 parentModel = parent ? parent->getModelMatrixForChildren() : glm::mat4(1);
-    return parentModel
-    * glm::toMat4(rotationQuat) 
-    * glm::translate(model, position)
-    * glm::toMat4(localRotationQuat)
-    * glm::scale(model, scale);
-}
-
-glm::mat4 beamlib::Transform::getModelMatrixForChildren() const {
-    glm::mat4 parentModel = parent ? parent->getModelMatrixForChildren() : glm::mat4(1);
-    return parentModel
-    * glm::toMat4(rotationQuat) 
-    * glm::translate(glm::mat4(1), position);
-}
-
 void beamlib::Transform::RenderUI(std::string name) {
-    ImGui::DragFloat3(("position##" + name).c_str(), glm::value_ptr(position), 0.05);
+    ImGui::DragFloat3(("position##" + name).c_str(), glm::value_ptr(localPosition), 0.05);
     ImGui::DragFloat3(("scale##" + name).c_str(), glm::value_ptr(scale), 0.05);
 
     glm::vec3 newRotation = getRotationEuler();
@@ -175,10 +158,8 @@ void beamlib::Transform::RenderUI(std::string name) {
     RotateLocal(glm::angleAxis(deltaLocalRotation[2], glm::vec3(0, 0, 1)));
 }
 
-// TODO: implement `object lock`
-void beamlib::Camera::Update(GLFWwindow* window) {
+void beamlib::Camera::Update() {
     if (beamlib::mouse.getRightButtonPressed()) {
-        // TODO: change to euler based
         yaw += sensitivity * beamlib::mouse.getDeltaRight().x;
         pitch -= sensitivity * beamlib::mouse.getDeltaRight().y;
         if (pitch > 89.0f) {
@@ -189,27 +170,39 @@ void beamlib::Camera::Update(GLFWwindow* window) {
         }
     }
 
-    glm::vec3 up = glm::vec3(0, 1, 0);
-    glm::vec3 frontXZ = glm::normalize(glm::vec3(getFront().x, 0, getFront().z));
-    glm::vec3 right = glm::normalize(glm::cross(frontXZ, up));
+    if (isFirstPersonMode()) {
+        glm::vec3 up = glm::vec3(0, 1, 0);
+        glm::vec3 frontXZ = glm::normalize(glm::vec3(getFront().x, 0, getFront().z));
+        glm::vec3 right = glm::normalize(glm::cross(frontXZ, up));
 
-    if (ImGui::IsKeyDown(ImGuiKey_W)) {
-        transform.Translate(movementSpeed * frontXZ * beamlib::getDeltaTime());
-    }
-    if (ImGui::IsKeyDown(ImGuiKey_S)) {
-        transform.Translate(-movementSpeed * frontXZ * beamlib::getDeltaTime());
-    }
-    if (ImGui::IsKeyDown(ImGuiKey_D)) {
-        transform.Translate(movementSpeed * right * beamlib::getDeltaTime());
-    }
-    if (ImGui::IsKeyDown(ImGuiKey_A)) {
-        transform.Translate(-movementSpeed * right * beamlib::getDeltaTime());
-    }
-    if (ImGui::IsKeyDown(ImGuiKey_Space)) {
-        transform.Translate(movementSpeed * up * beamlib::getDeltaTime());
-    }
-    if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) {
-        transform.Translate(-movementSpeed * up * beamlib::getDeltaTime());
+        if (ImGui::IsKeyDown(ImGuiKey_W)) {
+            transform.Translate(movementSpeed * frontXZ * beamlib::getDeltaTime());
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_S)) {
+            transform.Translate(-movementSpeed * frontXZ * beamlib::getDeltaTime());
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_D)) {
+            transform.Translate(movementSpeed * right * beamlib::getDeltaTime());
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_A)) {
+            transform.Translate(-movementSpeed * right * beamlib::getDeltaTime());
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_Space)) {
+            transform.Translate(movementSpeed * up * beamlib::getDeltaTime());
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) {
+            transform.Translate(-movementSpeed * up * beamlib::getDeltaTime());
+        }
+    } else {
+        if (ImGui::IsKeyDown(ImGuiKey_W)) {
+            radius -= movementSpeed * beamlib::getDeltaTime();
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_S)) {
+            radius += movementSpeed * beamlib::getDeltaTime();
+        }
+        if (radius < 0.1) {
+            radius = 0.1;
+        }
     }
 }
 
@@ -235,7 +228,7 @@ void beamlib::ShaderProgram::CheckProgramLinkStatus(GLuint program) {
     }
 }
 
-const char *beamlib::ShaderProgram::SlurpFile(const char *path) {
+const char *beamlib::SlurpFile(const char *path) {
     FILE *fp = std::fopen(path, "rb");
     if (!fp) {
         std::fprintf(stderr, "Failed to open %s\n", path);
@@ -256,7 +249,7 @@ const char *beamlib::ShaderProgram::SlurpFile(const char *path) {
     return src;
 }
 
-beamlib::ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath) {
+void beamlib::ShaderProgram::Load(const char* vertexPath, const char* fragmentPath) {
     id = glCreateProgram();
 
     GLuint vertexShader;

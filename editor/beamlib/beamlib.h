@@ -27,6 +27,7 @@ void EndUI();
 double getTimeElapsed();
 float getFrameRate();
 float getDeltaTime();
+const char *SlurpFile(const char *path);
 
 void dbg(glm::vec3 vec);
 void dbg(glm::quat q);
@@ -40,7 +41,7 @@ glm::mat4 vectorToMat4(std::vector<float> data);
 
 class Transform {
     Transform *parent = NULL;
-    glm::vec3 position = {0, 0, 0};
+    glm::vec3 localPosition = {0, 0, 0};
     glm::quat rotationQuat = glm::angleAxis(0.0f, glm::vec3({0, 1, 0}));
     glm::quat localRotationQuat = glm::angleAxis(0.0f, glm::vec3({0, 1, 0}));
     glm::vec3 scale = {1, 1, 1};
@@ -48,30 +49,44 @@ class Transform {
 public:
     void setParent(Transform *transform) { parent = transform; }
 
-    void Translate(glm::vec3 offset) { position += offset; }
+    void Translate(glm::vec3 offset) { localPosition += offset; }
     void Rotate(glm::quat quat) { rotationQuat *= quat; }
-    void Rotate(glm::vec3 euler) { Rotate(glm::quat(euler)); }
     void RotateLocal(glm::quat quat) { localRotationQuat *= quat; }
     void RotateLocal(glm::vec3 euler) { Rotate(glm::quat(euler)); }
     void Scale(glm::vec3 scale) { scale *= scale; }
 
-    glm::vec3 getPosition() const { return position; }
+    glm::vec3 getPosition() const { return rotationQuat * (parent ? parent->getPosition() + localPosition : localPosition); }
+    glm::vec3 getLocalPosition() const { return localPosition; }
     glm::vec3 getRotationEuler() const { return glm::eulerAngles(rotationQuat); }
     glm::vec3 getLocalRotationEuler() const { return glm::eulerAngles(localRotationQuat); }
-    glm::mat4 getModelMatrix() const;
-    glm::mat4 getModelMatrixForChildren() const;
+    glm::quat getLocalRotationQuat() const { return localRotationQuat; }
+    glm::mat4 getModelMatrix() const {
+        glm::mat4 model(1);
+        glm::mat4 parentModel = parent ? parent->getModelMatrixForChildren() : glm::mat4(1);
+        return parentModel
+        * glm::toMat4(rotationQuat) 
+        * glm::translate(model, localPosition)
+        * glm::toMat4(localRotationQuat)
+        * glm::scale(model, scale);
+    }
+    glm::mat4 getModelMatrixForChildren() const {
+        glm::mat4 parentModel = parent ? parent->getModelMatrixForChildren() : glm::mat4(1);
+        return parentModel
+        * glm::toMat4(rotationQuat) 
+        * glm::translate(glm::mat4(1), localPosition);
+    }
 
     void RenderUI(std::string name);
     json SerializeModel() {
         return {
-            {"position", toVector(position)},
+            {"position", toVector(localPosition)},
             {"rotationQuat", toVector(rotationQuat)},
             {"localRotationQuat", toVector(localRotationQuat)},
             {"scale", toVector(scale)},
         };
     }
     void LoadModel(json j) {
-        position = vectorToVec3(j["position"]);
+        localPosition = vectorToVec3(j["position"]);
         rotationQuat = vectorToQuat(j["rotationQuat"]);
         localRotationQuat = vectorToQuat(j["localRotationQuat"]);
         scale = vectorToVec3(j["scale"]);
@@ -91,42 +106,16 @@ public:
 };
 extern Mouse mouse;
 
-class Camera {
-    float yaw = -90.0f;
-    float pitch = 0.0f;
-
-    float fovy = 45;
-    float aspect = 800.0 / 600;
-    float near = 0.1;
-    float far = 100;
-
-    float sensitivity = 0.2;
-    float movementSpeed = 5;
-
-public:
-    beamlib::Transform transform;
-
-    void setAspect(float aspect) { this->aspect = aspect; }
-
-    glm::vec3 getFront() const { return glm::vec3(cos(glm::radians(yaw)) * cos(glm::radians(pitch)), sin(glm::radians(pitch)), sin(glm::radians(yaw)) * cos(glm::radians(pitch))); }
-    glm::mat4 getViewMatrix() const { return glm::lookAt(transform.getPosition(), transform.getPosition() + getFront(), {0, 1, 0}); }
-    glm::mat4 getProjectionMatrix() const { return glm::perspective(glm::radians(fovy), aspect, near, far); }
-
-    void Update(GLFWwindow* window);
-};
-extern Camera camera;
-
 class ShaderProgram {
     GLuint id;
 
     void CheckShaderCompileStatus(GLuint shader);
     void CheckProgramLinkStatus(GLuint program);
-    const char *SlurpFile(const char *path);
 
 public:
     GLuint getId() const { return id; }
 
-    ShaderProgram(const char* vertexPath, const char* fragmentPath);
+    void Load(const char* vertexPath, const char* fragmentPath);
     void Use() const { glUseProgram(id); }
 
     void setUniformBool(const std::string &name, bool value) const { glUniform1i(glGetUniformLocation(id, name.c_str()), (int)value); }
@@ -140,25 +129,27 @@ public:
 
 class Object {
 public:
-    beamlib::ShaderProgram shaderProgram;
-    Object(ShaderProgram program) : shaderProgram(program) {}
     virtual void Update() = 0;
     virtual void Render() = 0;
 };
+
+class Instance;
+extern std::map<std::string, Instance*> instanceStore;
 
 class Instance {
 protected:
     Object *object;
     std::vector<Instance *> children;
-    std::string name;
 
 public:
     Transform transform;
+    std::string name;
 
     Instance(Object *object, std::string name) : object(object), name(name) {}
 
     void PushChild(Instance *child) {
         child->transform.setParent(&transform);
+        instanceStore.insert({child->name, child});
         children.push_back(child);
     }
 
@@ -185,21 +176,24 @@ public:
     virtual void CustomUpdate() {}
     virtual void Update() {
         CustomUpdate();
-        object->Update();
+        if (object != NULL)  {
+            object->Update();
+        }
         for (auto child : children) child->Update();
     }
     virtual void CustomRender() {}
     virtual void Render() {
-        object->shaderProgram.Use();
-        object->shaderProgram.setUniformMat4("model", transform.getModelMatrix());
         CustomRender();
-        object->Render();
+        if (object != NULL) {
+            object->Render();
+        }
         for (auto child : children) child->Render();
     }
     virtual void CustomRenderUI() {}
     virtual void RenderUI() {
         if (ImGui::TreeNode(name.c_str())) {
             if (ImGui::Button(("export##" + name).c_str())) {
+                // TODO: save this to a file, or work with animation editor.
                 std::cout << Serialize() << "\n";
             }
             transform.RenderUI(name);
@@ -210,5 +204,91 @@ public:
         }
     }
 };
+
+class DummyInstance : public Instance {
+public:
+    DummyInstance(beamlib::Object *object, std::string name) : Instance(object, name) {}
+};
+
+class Camera : public Instance {
+    float yaw = -90.0f;
+    float pitch = 0.0f;
+    float yaw_prev = -90.0f;
+    float pitch_prev = 0.0f;
+
+    Instance *targetInstance;
+    float radius = 5;
+
+    float fovy = 45;
+    float aspect = 800.0 / 600;
+    float near = 0.1;
+    float far = 100;
+
+    float sensitivity = 0.05;
+    float movementSpeed = 5;
+
+public:
+    Camera(beamlib::Object *object, std::string name) : Instance(object, name) {}
+
+    void setAspect(float aspect) { this->aspect = aspect; }
+    bool isFirstPersonMode() const {
+        return targetInstance == NULL;
+    }
+    void setTargetInstance(Instance *target) {
+        if (!targetInstance) {
+            yaw_prev = yaw;
+            pitch_prev = pitch;
+        }
+        targetInstance = target;
+    }
+    void removeTargetInstance() {
+        yaw = yaw_prev;
+        pitch = pitch_prev;
+        setTargetInstance(NULL);
+    }
+    Transform *getTargetTranform() const { return &targetInstance->transform; }
+
+    glm::vec3 getFront() const { return glm::vec3(cos(glm::radians(yaw)) * cos(glm::radians(pitch)), sin(glm::radians(pitch)), sin(glm::radians(yaw)) * cos(glm::radians(pitch))); }
+    glm::mat4 getViewMatrix() const {
+        if (isFirstPersonMode()) {
+            return glm::lookAt(transform.getLocalPosition(), transform.getLocalPosition() + getFront(), {0, 1, 0});
+        } else {
+            return glm::lookAt(getTargetTranform()->getPosition() - radius * getFront(), getTargetTranform()->getPosition(), {0, 1, 0});
+        }
+    }
+    glm::mat4 getProjectionMatrix() const { return glm::perspective(glm::radians(fovy), aspect, near, far); }
+
+    void Update() override;
+
+    void CustomRenderUI() override {
+        if (!isFirstPersonMode()) {
+            ImGui::DragFloat(("radius##" + name).c_str(), &radius, 0.2);
+            if (ImGui::Button(("Go Back To First Person Mode##" + name).c_str())) {
+                removeTargetInstance();
+            }
+        }
+    }
+
+    json CustomSerialize() override {
+        return {
+            {"radius", radius},
+            {"pitch", pitch},
+            {"yaw", yaw},
+            {"pitch_prev", pitch_prev},
+            {"yaw_prev", yaw_prev},
+            {"target", targetInstance->name},
+        };
+    }
+
+    void CustomLoad(json j) override {
+        radius = j["radius"];
+        pitch = j["pitch"];
+        yaw = j["yaw"];
+        pitch_prev = j["pitch_prev"];
+        yaw_prev = j["yaw_prev"];
+        targetInstance = instanceStore.at(j["target"]);
+    }
+};
+extern Camera camera;
 
 } // namespace beamlib
