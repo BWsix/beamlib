@@ -31,10 +31,10 @@ GLFWwindow *beamlib::CreateWindow(const char *title, int width, int height) {
 
     assert(glfwInit() && "Failed to initialize GLFW ._.");
 
-    // GL 4.6 + GLSL 460
-    const char *glsl_version = "#version 460";
+    // GL 4.5 + GLSL 450
+    const char *glsl_version = "#version 450";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
     // setup window
