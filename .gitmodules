@@ -10,3 +10,6 @@
 [submodule "externals/json"]
 	path = externals/json
 	url = https://github.com/nlohmann/json.git
+[submodule "externals/assimp"]
+	path = externals/assimp
+	url = https://github.com/assimp/assimp

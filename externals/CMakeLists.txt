@@ -10,6 +10,9 @@ add_subdirectory(glm)
 # json
 add_subdirectory(json)
 
+# assimp
+add_subdirectory(assimp)
+
 # imgui
 add_library(imgui
     imgui/imconfig.h

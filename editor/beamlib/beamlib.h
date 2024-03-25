@@ -238,9 +238,8 @@ public:
 
 class DummyInstance : public Instance {
 public:
-    DummyInstance(beamlib::Object *object, std::string name) : Instance(object, name) {}
+    using Instance::Instance;
 };
-
 class Camera : public Instance {
     float yaw = -90.0f;
     float pitch = 0.0f;
@@ -259,7 +258,7 @@ class Camera : public Instance {
     float movementSpeed = 5;
 
 public:
-    Camera(beamlib::Object *object, std::string name) : Instance(object, name) {}
+    using Instance::Instance;
 
     void setAspect(float aspect) { this->aspect = aspect; }
     bool isFirstPersonMode() const {

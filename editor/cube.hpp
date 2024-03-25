@@ -86,7 +86,7 @@ class CubeInstance : public beamlib::Instance {
 public:
     glm::vec3 color = {1, 1, 1};
 
-    CubeInstance(beamlib::Object *object, std::string name) : Instance(object, name) {}
+    using Instance::Instance;
 
     json CustomSerialize() override {
         return {

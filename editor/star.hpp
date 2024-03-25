@@ -81,9 +81,9 @@ public:
 
 class StarInstance : public beamlib::Instance {
 public:
-    glm::vec3 color = {1, 1, 1};
+    using Instance::Instance;
 
-    StarInstance(beamlib::Object *object, std::string name) : Instance(object, name) {}
+    glm::vec3 color = {1, 1, 1};
 
     json CustomSerialize() override {
         return {

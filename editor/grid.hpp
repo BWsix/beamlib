@@ -44,7 +44,7 @@ public:
 
 class GridInstance : public beamlib::Instance {
 public:
-    GridInstance(beamlib::Object *object, std::string name) : Instance(object, name) {}
+    using Instance::Instance;
 
     void CustomRender() override {
         store::gridProgram.Use();
