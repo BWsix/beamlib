@@ -78,7 +78,8 @@ public:
         glm::mat4 parentModel = parent ? parent->getModelMatrixForChildren() : glm::mat4(1);
         return parentModel
         * glm::toMat4(rotationQuat) 
-        * glm::translate(glm::mat4(1), position);
+        * glm::translate(glm::mat4(1), position)
+        * glm::toMat4(localRotationQuat);
     }
 
     void RenderUI(std::string name);
