@@ -37,5 +37,5 @@ target_include_directories(imgui PUBLIC "imgui/backends/")
 target_link_libraries(imgui PRIVATE glfw)
 
 # stb_image
-add_library(stb INTERFACE stb/stb_image.h)
+add_library(stb INTERFACE stb/stb_image.h stb/stb_include.h)
 target_include_directories(stb INTERFACE "stb/")

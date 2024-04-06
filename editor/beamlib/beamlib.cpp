@@ -13,6 +13,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
+#define STB_INCLUDE_IMPLEMENTATION
+#define STB_INCLUDE_LINE_GLSL
+#include "stb_include.h"
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -228,33 +231,12 @@ void beamlib::ShaderProgram::CheckProgramLinkStatus(GLuint program) {
     }
 }
 
-const char *beamlib::SlurpFile(const char *path) {
-    FILE *fp = std::fopen(path, "rb");
-    if (!fp) {
-        std::fprintf(stderr, "Failed to open %s\n", path);
-        exit(1);
-    }
-
-    fseek(fp, 0, SEEK_END);
-    size_t sz = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    char *src = new char[sz + 1];
-    src[sz] = '\0';
-    size_t bytes_read = fread(src, sizeof(char), sz, fp);
-    if (bytes_read != sz) {
-        std::fprintf(stderr, "Failed to fully read content of %s\n", path);
-        exit(1);
-    }
-    fclose(fp);
-    return src;
-}
-
 void beamlib::ShaderProgram::Load(const char* vertexPath, const char* fragmentPath) {
     id = glCreateProgram();
 
     GLuint vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    const char *vertexShaderSource = SlurpFile(vertexPath);
+    const char *vertexShaderSource = stb_include_file(const_cast<char *>(vertexPath), "include", "editor/shaders", NULL);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
     CheckShaderCompileStatus(vertexShader);
@@ -262,7 +244,7 @@ void beamlib::ShaderProgram::Load(const char* vertexPath, const char* fragmentPa
 
     GLuint fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    const char *fragmentShaderSource = SlurpFile(fragmentPath);
+    const char *fragmentShaderSource = stb_include_file(const_cast<char *>(fragmentPath), "include", "editor/shaders", NULL);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
     CheckShaderCompileStatus(fragmentShader);

@@ -27,7 +27,6 @@ void EndUI();
 double getTimeElapsed();
 float getFrameRate();
 float getDeltaTime();
-const char *SlurpFile(const char *path);
 
 void dbg(glm::vec3 vec);
 void dbg(glm::quat q);

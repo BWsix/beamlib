@@ -1,7 +1,7 @@
 *
 
 !.gitignore
-!.gitmodule
+!.gitmodules
 !CMakeLists.txt
 !README.md
 
