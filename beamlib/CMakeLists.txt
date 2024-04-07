@@ -11,7 +11,6 @@ add_library(beamlib
   model.h
   mouse.cpp
   mouse.h
-  object.h
   resourceManager.cpp
   resourceManager.h
   shaderProgram.cpp
