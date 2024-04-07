@@ -1,8 +1,5 @@
 #include "model.h"
-
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
 #include <iostream>
 
 void Blib::Model::loadModel(std::string path) {
@@ -167,4 +164,3 @@ GLuint Blib::loadCubeMap(const std::vector<std::string> &faces) {
 
     return textureID;
 }
-

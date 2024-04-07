@@ -7,18 +7,21 @@ namespace Blib {
 class Transform {
     Transform *parent = NULL;
     glm::vec3 position = {0, 0, 0};
+    glm::vec3 localPosition = {0, 0, 0};
     glm::quat rotationQuat = glm::angleAxis(0.0f, glm::vec3({0, 1, 0}));
     glm::quat localRotationQuat = glm::angleAxis(0.0f, glm::vec3({0, 1, 0}));
     glm::vec3 scale = {1, 1, 1};
+    glm::vec3 localScale = {1, 1, 1};
 
 public:
     void setParent(Transform *transform) { parent = transform; }
-
     void Translate(glm::vec3 offset) { position += offset; }
+    void TranslateLocal(glm::vec3 offset) { localPosition += offset; }
     void Rotate(glm::quat quat) { rotationQuat *= quat; }
     void RotateLocal(glm::quat quat) { localRotationQuat *= quat; }
     void RotateLocal(glm::vec3 euler) { Rotate(glm::quat(euler)); }
     void Scale(glm::vec3 scale) { scale *= scale; }
+    void ScaleLocal(glm::vec3 scale) { localScale *= scale; }
 
     glm::vec3 getPosition() const { return rotationQuat * (parent ? parent->getPosition() + position : position); }
     glm::vec3 getLocalPosition() const { return position; }

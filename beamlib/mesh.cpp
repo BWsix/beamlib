@@ -37,7 +37,7 @@ void Mesh::setupMesh() {
 
 void Mesh::draw(Blib::ShaderProgram &shader) const {
     // shader.setUniformVec3("lighting.ambient", lighting.ambientColor);
-    shader.setUniformVec3("lighting.diffuse", lighting.diffuseColor);
+    shader.SetVec3("lighting.diffuse", lighting.diffuseColor);
 
     size_t diffuseNumber = 1;
     size_t specularNumber = 1;
@@ -54,7 +54,7 @@ void Mesh::draw(Blib::ShaderProgram &shader) const {
             number = std::to_string(specularNumber++);
         }
 
-        shader.setUniformInt("material." + name + number, i);
+        shader.SetInt("material." + name + number, i);
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
     glActiveTexture(GL_TEXTURE0);

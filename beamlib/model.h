@@ -1,12 +1,10 @@
 #pragma once
 
+#include "mesh.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <map>
-
-#include "utils.h"
-#include "mesh.h"
 
 namespace Blib {
 

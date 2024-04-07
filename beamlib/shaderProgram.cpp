@@ -1,8 +1,8 @@
 #include "shaderProgram.h"
-
-#define STB_INCLUDE_IMPLEMENTATION
-#define STB_INCLUDE_LINE_GLSL
 #include "stb_include.h"
+
+const char *keyword = "include";
+const char *folder = "shaders";
 
 void Blib::ShaderProgram::CheckShaderCompileStatus(GLuint shader) {
     int success;
@@ -26,32 +26,31 @@ void Blib::ShaderProgram::CheckProgramLinkStatus(GLuint program) {
     }
 }
 
-void Blib::ShaderProgram::Load(const char* vertexPath, const char* fragmentPath) {
-    id = glCreateProgram();
-
-    char keyword[] = "include";
-    char folder[] = "shaders";
+void Blib::ShaderProgram::Compile(const char* vertexPath, const char* fragmentPath) {
+    ID = glCreateProgram();
 
     GLuint vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    const char *vertexShaderSource = stb_include_file(const_cast<char *>(vertexPath), keyword, folder, NULL);
+    char *vertexShaderSource = stb_include_file((char *)vertexPath, (char *)keyword, (char *)folder, NULL);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
     CheckShaderCompileStatus(vertexShader);
-    glAttachShader(id, vertexShader);
+    glAttachShader(ID, vertexShader);
 
     GLuint fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    const char *fragmentShaderSource = stb_include_file(const_cast<char *>(fragmentPath), keyword, folder, NULL);
+    char *fragmentShaderSource = stb_include_file((char *)fragmentPath, (char *)keyword, (char *)folder, NULL);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
     CheckShaderCompileStatus(fragmentShader);
-    glAttachShader(id, fragmentShader);
+    glAttachShader(ID, fragmentShader);
 
-    glLinkProgram(id);
-    CheckProgramLinkStatus(id);
+    glLinkProgram(ID);
+    CheckProgramLinkStatus(ID);
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-}
 
+    free(vertexShaderSource);
+    free(fragmentShaderSource);
+}

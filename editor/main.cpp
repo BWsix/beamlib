@@ -1,7 +1,10 @@
 #include <beamlib.h>
 
+void loadResources();
+
 int main() {
     const auto window = Blib::CreateWindow("Blib");
+    loadResources();
 
     // setup resize callback
     glfwSetWindowSizeCallback(window, [](GLFWwindow *, int width, int height){
@@ -14,13 +17,6 @@ int main() {
 
     Blib::camera.transform.Translate({0, 0, 10});
 
-    Blib::ShaderProgram prog;
-    prog.Load("shaders/gundam.vert.glsl", "shaders/gundam.frag.glsl");
-    Blib::Model body;
-    body.load("models/body.obj");
-    Blib::Model head;
-    head.load("models/head.obj");
-
     while (!Blib::WindowShouldClose(window)) {
         glfwPollEvents();
         glfwSwapBuffers(window);
@@ -28,14 +24,6 @@ int main() {
         Blib::camera.Update();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        prog.Use();
-        prog.setUniformMat4("model", glm::mat4(1));
-        prog.setUniformMat4("view", Blib::camera.getViewMatrix());
-        prog.setUniformMat4("projection", Blib::camera.getProjectionMatrix());
-        body.draw(prog);
-        prog.setUniformMat4("model", glm::translate(glm::mat4(1), glm::vec3(0.0f, 4.0f, 0.0f)));
-        head.draw(prog);
 
         Blib::BeginUI();
         ImGui::Begin("Info", NULL, ImGuiWindowFlags_AlwaysAutoResize);
@@ -51,4 +39,27 @@ int main() {
     Blib::DestroyWindow(window);
 
     return 0;
+}
+
+void loadResources() {
+    // gundam
+    Blib::ResourceManager::LoadShader("prog", "shaders/gundam.vert.glsl", "shaders/gundam.frag.glsl");
+    Blib::ResourceManager::LoadModel("back", "models/gundam/back.obj");
+    Blib::ResourceManager::LoadModel("body", "models/gundam/body.obj");
+    Blib::ResourceManager::LoadModel("dbody", "models/gundam/dbody.obj");
+    Blib::ResourceManager::LoadModel("dlefthand", "models/gundam/dlefthand.obj");
+    Blib::ResourceManager::LoadModel("dleftleg", "models/gundam/dleftleg.obj");
+    Blib::ResourceManager::LoadModel("drighthand", "models/gundam/drighthand.obj");
+    Blib::ResourceManager::LoadModel("drightleg", "models/gundam/drightleg.obj");
+    Blib::ResourceManager::LoadModel("head", "models/gundam/head.obj");
+    Blib::ResourceManager::LoadModel("leftfoot", "models/gundam/leftfoot.obj");
+    Blib::ResourceManager::LoadModel("lefthand", "models/gundam/lefthand.obj");
+    Blib::ResourceManager::LoadModel("lshouder", "models/gundam/lshouder.obj");
+    Blib::ResourceManager::LoadModel("rightfoot", "models/gundam/rightfoot.obj");
+    Blib::ResourceManager::LoadModel("righthand", "models/gundam/righthand.obj");
+    Blib::ResourceManager::LoadModel("rshouder", "models/gundam/rshouder.obj");
+    Blib::ResourceManager::LoadModel("ulefthand", "models/gundam/ulefthand.obj");
+    Blib::ResourceManager::LoadModel("uleftleg", "models/gundam/uleftleg.obj");
+    Blib::ResourceManager::LoadModel("urighthand", "models/gundam/urighthand.obj");
+    Blib::ResourceManager::LoadModel("urightleg", "models/gundam/urightleg.obj");
 }
