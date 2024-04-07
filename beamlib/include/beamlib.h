@@ -11,7 +11,6 @@
 #include "../mesh.h"
 #include "../model.h"
 #include "../mouse.h"
-#include "../object.h"
 #include "../resourceManager.h"
 #include "../shaderProgram.h"
 #include "../texture.h"
