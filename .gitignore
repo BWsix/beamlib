@@ -8,6 +8,14 @@
 !externals/
 !externals/**/*
 
+!beamlib/
+!beamlib/**/*
+
 !editor/
 !editor/**/*
 
+!models/
+!models/**/*
+
+!shaders/
+!shaders/**/*

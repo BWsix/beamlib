@@ -1,8 +1,6 @@
-add_subdirectory(beamlib)
-
-add_executable(editor main.cpp shaderProgramStore.cpp model.cpp mesh.cpp)
-target_link_libraries(editor PRIVATE glad glfw glm imgui nlohmann_json beamlib assimp stb)
+add_executable(editor main.cpp)
+target_link_libraries(editor PRIVATE glad glfw glm imgui nlohmann_json beamlib assimp stb beamlib)
 
 if(UNIX)
-target_compile_options(beamlib PRIVATE "-Wall" "-Wextra" "-ggdb")
+target_compile_options(editor PRIVATE "-Wall" "-Wextra" "-ggdb")
 endif()
