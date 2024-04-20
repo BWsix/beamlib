@@ -1,5 +1,8 @@
 #pragma once
 
+#include "model.h"
+#include "shaderProgram.h"
+#include "frameData.h"
 #include "utils.h"
 #include "transform.h"
 
@@ -9,14 +12,15 @@ namespace Blib {
 
 class Instance {
 protected:
-    Object *object;
+    Model model;
     std::vector<Instance *> children;
 
 public:
     Transform transform;
     std::string name;
 
-    Instance(Object *object, std::string name) : object(object), name(name) {}
+    Instance(std::string name) : name(name) {}
+    Instance(std::string name, Model model) : model(model), name(name) {}
 
     void PushChild(Instance *child);
 
@@ -46,7 +50,7 @@ public:
         (void)from; (void)to; (void)progress;
         return {};
     }
-    json Interpolator(json from, json to, float progress) {
+    json Interpolator(json& from, json& to, float progress) {
         json j;
         j["name"] = from["name"];
         j["transform"] = transform.Interpolator(from["transform"], to["transform"], progress);
@@ -61,26 +65,19 @@ public:
     virtual void CustomUpdate() {}
     virtual void Update() {
         CustomUpdate();
-        if (object != NULL)  {
-            object->Update();
-        }
         for (auto child : children) child->Update();
     }
+
     virtual void CustomRender() {}
-    virtual void Render() {
+    virtual void Render(ShaderProgram& shader) {
         CustomRender();
-        if (object != NULL) {
-            object->Render();
-        }
-        for (auto child : children) child->Render();
+        shader.SetMat4("model", transform.getModelMatrix());
+        model.draw(shader);
+        for (auto child : children) child->Render(shader);
     }
     virtual void CustomRenderUI() {}
     virtual void RenderUI() {
         if (ImGui::TreeNode(name.c_str())) {
-            if (ImGui::Button(("export##" + name).c_str())) {
-                // TODO: save this to a file, or work with animation editor.
-                std::cout << Serialize() << "\n";
-            }
             transform.RenderUI(name);
             CustomRenderUI();
             if (children.size() != 0) ImGui::Separator();

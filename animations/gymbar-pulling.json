@@ -1,0 +1,646 @@
+{
+  "frames": [
+    {
+      "absoluteDuration": 0.0,
+      "data": {
+        "children": [
+          {
+            "children": [],
+            "data": null,
+            "name": "head",
+            "transform": {
+              "localRotationQuat": [
+                -0.319308340549469,
+                0.0,
+                0.0,
+                0.9476494789123535
+              ],
+              "position": [0.0, 4.150000095367432, -1.2000000476837158],
+              "rotationQuat": [0.0, 0.0, 0.0, 0.9999997615814209],
+              "scale": [1.0, 1.0, 1.0]
+            }
+          },
+{"children":[],"data":null,"name":"beam","transform":{"localRotationQuat":[0.0,0.0,0.0,1.0],"position":[0.0,0.0,0.0],"rotationQuat":[0.0,0.0,0.0,1.0],"scale":[0.0,0.0,0.0]}},{"children":[],"data":null,"name":"ball","transform":{"localRotationQuat":[0.0,0.0,0.0,1.0],"position":[0.0,0.0,0.0],"rotationQuat":[0.0,0.0,0.0,1.0],"scale":[0.0,0.0,0.0]}},
+          {
+            "children": [],
+            "data": null,
+            "name": "back",
+            "transform": {
+              "localRotationQuat": [0.0, 0.0, 0.0, 1.0],
+              "position": [0.0, 2.0999999046325684, -4.5],
+              "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+              "scale": [1.0, 1.0, 1.0]
+            }
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [],
+                        "data": null,
+                        "name": "lefthand",
+                        "transform": {
+                          "localRotationQuat": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.9999951124191284
+                          ],
+                          "position": [
+                            0.15000000596046448,
+                            -4.699999809265137,
+                            0.10000000149011612
+                          ],
+                          "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                          "scale": [1.0, 1.0, 1.0]
+                        }
+                      }
+                    ],
+                    "data": null,
+                    "name": "dlefthand",
+                    "transform": {
+                      "localRotationQuat": [0.0, 0.0, 0.0, 0.9999778866767883],
+                      "position": [0.0, -3.3499999046325684, 0.0],
+                      "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                      "scale": [1.0, 1.0, 1.0]
+                    }
+                  }
+                ],
+                "data": null,
+                "name": "ulefthand",
+                "transform": {
+                  "localRotationQuat": [
+                    0.0,
+                    0.0,
+                    0.04997909441590309,
+                    0.998748779296875
+                  ],
+                  "position": [-0.3499999940395355, -0.20000000298023224, 0.0],
+                  "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                  "scale": [1.0, 1.0, 1.0]
+                }
+              }
+            ],
+            "data": null,
+            "name": "lshouder",
+            "transform": {
+              "localRotationQuat": [
+                -0.8009287118911743,
+                -0.08408447355031967,
+                0.5903621315956116,
+                0.05394754186272621
+              ],
+              "position": [
+                4.099999904632568,
+                1.100000023841858,
+                -1.149999976158142
+              ],
+              "rotationQuat": [0.0, 0.0, 0.0, 0.9999998211860657],
+              "scale": [1.0, 1.0, 1.0]
+            }
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [],
+                        "data": null,
+                        "name": "righthand",
+                        "transform": {
+                          "localRotationQuat": [0.0, 0.0, 0.0, 1.0],
+                          "position": [
+                            0.15000000596046448,
+                            -4.699999809265137,
+                            0.10000000149011612
+                          ],
+                          "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                          "scale": [1.0, 1.0, 1.0]
+                        }
+                      }
+                    ],
+                    "data": null,
+                    "name": "drighthand",
+                    "transform": {
+                      "localRotationQuat": [0.0, 0.0, 0.0, 0.9999999403953552],
+                      "position": [0.0, -3.3499999046325684, 0.0],
+                      "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                      "scale": [1.0, 1.0, 1.0]
+                    }
+                  }
+                ],
+                "data": null,
+                "name": "urighthand",
+                "transform": {
+                  "localRotationQuat": [
+                    0.0,
+                    0.0,
+                    -0.04997916519641876,
+                    0.9987502694129944
+                  ],
+                  "position": [0.0, -0.05000000074505806, 0.0],
+                  "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                  "scale": [1.0, 1.0, 1.0]
+                }
+              }
+            ],
+            "data": null,
+            "name": "rshouder",
+            "transform": {
+              "localRotationQuat": [
+                -0.7702553272247314,
+                0.060363784432411194,
+                -0.6255854368209839,
+                0.10818026214838028
+              ],
+              "position": [
+                -4.099999904632568,
+                1.850000023841858,
+                -1.149999976158142
+              ],
+              "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+              "scale": [1.0, 1.0, 1.0]
+            }
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [],
+                        "data": null,
+                        "name": "rightfoot",
+                        "transform": {
+                          "localRotationQuat": [
+                            0.0,
+                            0.0,
+                            0.024997392669320107,
+                            0.9996872544288635
+                          ],
+                          "position": [
+                            0.0,
+                            -5.800000190734863,
+                            -1.149999976158142
+                          ],
+                          "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                          "scale": [1.0, 1.0, 1.0]
+                        }
+                      }
+                    ],
+                    "data": null,
+                    "name": "drightleg",
+                    "transform": {
+                      "localRotationQuat": [
+                        0.8253746032714844,
+                        0.06201942265033722,
+                        0.0420481339097023,
+                        0.5595901012420654
+                      ],
+                      "position": [
+                        0.0,
+                        -6.400000095367432,
+                        0.20000000298023224
+                      ],
+                      "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                      "scale": [1.0, 1.0, 1.0]
+                    }
+                  }
+                ],
+                "data": null,
+                "name": "urightleg",
+                "transform": {
+                  "localRotationQuat": [
+                    -0.4102584719657898,
+                    0.04116315394639969,
+                    -0.0909515768289566,
+                    0.906481921672821
+                  ],
+                  "position": [
+                    -2.049999952316284,
+                    -1.600000023841858,
+                    -0.4000000059604645
+                  ],
+                  "rotationQuat": [0.0, 0.0, 0.0, 0.9999983310699463],
+                  "scale": [1.0, 1.0, 1.0]
+                }
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [],
+                        "data": null,
+                        "name": "leftfoot",
+                        "transform": {
+                          "localRotationQuat": [
+                            0.0,
+                            0.0,
+                            -0.024997390806674957,
+                            0.9996874332427979
+                          ],
+                          "position": [
+                            0.0,
+                            -5.800000190734863,
+                            -1.149999976158142
+                          ],
+                          "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                          "scale": [1.0, 1.0, 1.0]
+                        }
+                      }
+                    ],
+                    "data": null,
+                    "name": "dleftleg",
+                    "transform": {
+                      "localRotationQuat": [
+                        0.8253731727600098,
+                        -0.06201932579278946,
+                        -0.042048100382089615,
+                        0.5595892071723938
+                      ],
+                      "position": [
+                        0.0,
+                        -6.400000095367432,
+                        0.20000000298023224
+                      ],
+                      "rotationQuat": [0.0, 0.0, 0.0, 0.9999999403953552],
+                      "scale": [1.0, 1.0, 1.0]
+                    }
+                  }
+                ],
+                "data": null,
+                "name": "uleftleg",
+                "transform": {
+                  "localRotationQuat": [
+                    -0.41026005148887634,
+                    -0.041163381189107895,
+                    0.09095194935798645,
+                    0.9064856171607971
+                  ],
+                  "position": [
+                    2.049999952316284,
+                    -1.600000023841858,
+                    -0.4000000059604645
+                  ],
+                  "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                  "scale": [1.0, 1.0, 1.0]
+                }
+              }
+            ],
+            "data": null,
+            "name": "dbody",
+            "transform": {
+              "localRotationQuat": [0.0, 0.0, 0.0, 0.9999999403953552],
+              "position": [0.0, -5.25, -0.800000011920929],
+              "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+              "scale": [1.0, 1.0, 1.0]
+            }
+          }
+        ],
+        "data": null,
+        "name": "body",
+        "transform": {
+          "localRotationQuat": [0.0, 0.0, 0.0, 1.0],
+          "position": [0.0, -3.3499999046325684, 0.0],
+          "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+          "scale": [1.0, 1.0, 1.0]
+        }
+      },
+      "duration": 1.0,
+      "easingFunc": 3
+    },
+    {
+      "absoluteDuration": 1.0,
+      "data": {
+        "children": [
+          {
+            "children": [],
+            "data": null,
+            "name": "head",
+            "transform": {
+              "localRotationQuat": [
+                -0.319308340549469,
+                0.0,
+                0.0,
+                0.9476494789123535
+              ],
+              "position": [0.0, 4.150000095367432, -1.2000000476837158],
+              "rotationQuat": [0.0, 0.0, 0.0, 0.9999997615814209],
+              "scale": [1.0, 1.0, 1.0]
+            }
+          },
+{"children":[],"data":null,"name":"beam","transform":{"localRotationQuat":[0.0,0.0,0.0,1.0],"position":[0.0,0.0,0.0],"rotationQuat":[0.0,0.0,0.0,1.0],"scale":[0.0,0.0,0.0]}},{"children":[],"data":null,"name":"ball","transform":{"localRotationQuat":[0.0,0.0,0.0,1.0],"position":[0.0,0.0,0.0],"rotationQuat":[0.0,0.0,0.0,1.0],"scale":[0.0,0.0,0.0]}},
+          {
+            "children": [],
+            "data": null,
+            "name": "back",
+            "transform": {
+              "localRotationQuat": [0.0, 0.0, 0.0, 1.0],
+              "position": [0.0, 2.0999999046325684, -4.5],
+              "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+              "scale": [1.0, 1.0, 1.0]
+            }
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [],
+                        "data": null,
+                        "name": "lefthand",
+                        "transform": {
+                          "localRotationQuat": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.9999951124191284
+                          ],
+                          "position": [
+                            0.15000000596046448,
+                            -4.699999809265137,
+                            0.10000000149011612
+                          ],
+                          "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                          "scale": [1.0, 1.0, 1.0]
+                        }
+                      }
+                    ],
+                    "data": null,
+                    "name": "dlefthand",
+                    "transform": {
+                      "localRotationQuat": [
+                        -0.3302740752696991,
+                        -0.6468037366867065,
+                        -0.2221214473247528,
+                        0.6505228281021118
+                      ],
+                      "position": [0.0, -3.3499999046325684, 0.0],
+                      "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                      "scale": [1.0, 1.0, 1.0]
+                    }
+                  }
+                ],
+                "data": null,
+                "name": "ulefthand",
+                "transform": {
+                  "localRotationQuat": [
+                    -4.543526443967494e-09,
+                    -2.2736590388205968e-10,
+                    0.04997909069061279,
+                    0.9987483620643616
+                  ],
+                  "position": [-0.3499999940395355, -0.20000000298023224, 0.0],
+                  "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                  "scale": [1.0, 1.0, 1.0]
+                }
+              }
+            ],
+            "data": null,
+            "name": "lshouder",
+            "transform": {
+              "localRotationQuat": [
+                -0.9248508214950562,
+                0.34041568636894226,
+                -0.09348561614751816,
+                0.141499862074852
+              ],
+              "position": [
+                4.099999904632568,
+                1.100000023841858,
+                -1.149999976158142
+              ],
+              "rotationQuat": [0.0, 0.0, 0.0, 0.9999998211860657],
+              "scale": [1.0, 1.0, 1.0]
+            }
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [],
+                        "data": null,
+                        "name": "righthand",
+                        "transform": {
+                          "localRotationQuat": [0.0, 0.0, 0.0, 1.0],
+                          "position": [
+                            0.15000000596046448,
+                            -4.699999809265137,
+                            0.10000000149011612
+                          ],
+                          "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                          "scale": [1.0, 1.0, 1.0]
+                        }
+                      }
+                    ],
+                    "data": null,
+                    "name": "drighthand",
+                    "transform": {
+                      "localRotationQuat": [
+                        -0.27158740162849426,
+                        0.6607895493507385,
+                        0.2794373631477356,
+                        0.6414903998374939
+                      ],
+                      "position": [0.0, -3.3499999046325684, 0.0],
+                      "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                      "scale": [1.0, 1.0, 1.0]
+                    }
+                  }
+                ],
+                "data": null,
+                "name": "urighthand",
+                "transform": {
+                  "localRotationQuat": [
+                    0.0,
+                    0.0,
+                    -0.04997916519641876,
+                    0.9987502694129944
+                  ],
+                  "position": [0.0, -0.05000000074505806, 0.0],
+                  "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                  "scale": [1.0, 1.0, 1.0]
+                }
+              }
+            ],
+            "data": null,
+            "name": "rshouder",
+            "transform": {
+              "localRotationQuat": [
+                -0.9422377347946167,
+                -0.306313693523407,
+                -0.09052568674087524,
+                0.10080868005752563
+              ],
+              "position": [
+                -4.099999904632568,
+                1.850000023841858,
+                -1.149999976158142
+              ],
+              "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+              "scale": [1.0, 1.0, 1.0]
+            }
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [],
+                        "data": null,
+                        "name": "rightfoot",
+                        "transform": {
+                          "localRotationQuat": [
+                            0.0,
+                            0.0,
+                            0.024997392669320107,
+                            0.9996872544288635
+                          ],
+                          "position": [
+                            0.0,
+                            -5.800000190734863,
+                            -1.149999976158142
+                          ],
+                          "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                          "scale": [1.0, 1.0, 1.0]
+                        }
+                      }
+                    ],
+                    "data": null,
+                    "name": "drightleg",
+                    "transform": {
+                      "localRotationQuat": [
+                        0.8253746032714844,
+                        0.06201942265033722,
+                        0.0420481339097023,
+                        0.5595901012420654
+                      ],
+                      "position": [
+                        0.0,
+                        -6.400000095367432,
+                        0.20000000298023224
+                      ],
+                      "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                      "scale": [1.0, 1.0, 1.0]
+                    }
+                  }
+                ],
+                "data": null,
+                "name": "urightleg",
+                "transform": {
+                  "localRotationQuat": [
+                    -0.4102584719657898,
+                    0.04116315394639969,
+                    -0.0909515768289566,
+                    0.906481921672821
+                  ],
+                  "position": [
+                    -2.049999952316284,
+                    -1.600000023841858,
+                    -0.4000000059604645
+                  ],
+                  "rotationQuat": [0.0, 0.0, 0.0, 0.9999983310699463],
+                  "scale": [1.0, 1.0, 1.0]
+                }
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "children": [],
+                        "data": null,
+                        "name": "leftfoot",
+                        "transform": {
+                          "localRotationQuat": [
+                            0.0,
+                            0.0,
+                            -0.024997390806674957,
+                            0.9996874332427979
+                          ],
+                          "position": [
+                            0.0,
+                            -5.800000190734863,
+                            -1.149999976158142
+                          ],
+                          "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                          "scale": [1.0, 1.0, 1.0]
+                        }
+                      }
+                    ],
+                    "data": null,
+                    "name": "dleftleg",
+                    "transform": {
+                      "localRotationQuat": [
+                        0.8253731727600098,
+                        -0.06201932579278946,
+                        -0.042048100382089615,
+                        0.5595892071723938
+                      ],
+                      "position": [
+                        0.0,
+                        -6.400000095367432,
+                        0.20000000298023224
+                      ],
+                      "rotationQuat": [0.0, 0.0, 0.0, 0.9999999403953552],
+                      "scale": [1.0, 1.0, 1.0]
+                    }
+                  }
+                ],
+                "data": null,
+                "name": "uleftleg",
+                "transform": {
+                  "localRotationQuat": [
+                    -0.41026005148887634,
+                    -0.041163381189107895,
+                    0.09095194935798645,
+                    0.9064856171607971
+                  ],
+                  "position": [
+                    2.049999952316284,
+                    -1.600000023841858,
+                    -0.4000000059604645
+                  ],
+                  "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+                  "scale": [1.0, 1.0, 1.0]
+                }
+              }
+            ],
+            "data": null,
+            "name": "dbody",
+            "transform": {
+              "localRotationQuat": [0.0, 0.0, 0.0, 0.9999999403953552],
+              "position": [0.0, -5.25, -0.800000011920929],
+              "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+              "scale": [1.0, 1.0, 1.0]
+            }
+          }
+        ],
+        "data": null,
+        "name": "body",
+        "transform": {
+          "localRotationQuat": [0.0, 0.0, 0.0, 1.0],
+          "position": [0.0, -1.25, 0.0],
+          "rotationQuat": [0.0, 0.0, 0.0, 1.0],
+          "scale": [1.0, 1.0, 1.0]
+        }
+      },
+      "duration": 1.0,
+      "easingFunc": 3
+    }
+  ]
+}

@@ -1,6 +1,4 @@
-#version 450
-
-out vec4 FragColor;
+#include "base.frag.glsl"
 
 void main() {
     FragColor = vec4(0.5, 0.5, 0.5, 1.0);

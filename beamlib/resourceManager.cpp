@@ -7,14 +7,16 @@ namespace Blib {
 std::map<std::string, Texture> ResourceManager::Textures;
 std::map<std::string, ShaderProgram> ResourceManager::Shaders;
 std::map<std::string, Model> ResourceManager::Models;
+std::map<std::string, json> ResourceManager::Animations;
+std::map<std::string, GLuint> ResourceManager::GLuints;
 
-ShaderProgram ResourceManager::LoadShader(std::string name, const char *vertexPath, const char *fragmentPath) {
+const ShaderProgram& ResourceManager::LoadShader(std::string name, const char *vertexPath, const char *fragmentPath) {
     auto prog = ShaderProgram();
     prog.Compile(vertexPath, fragmentPath);
     return ResourceManager::Shaders[name] = prog;
 }
 
-Model ResourceManager::LoadModel(std::string name, const char *path) {
+const Model& ResourceManager::LoadModel(std::string name, const char *path) {
     auto m = Model();
     m.load(path);
     return ResourceManager::Models[name] = m;

@@ -82,10 +82,33 @@ void Blib::EndUI() {
 double Blib::getTimeElapsed() { return glfwGetTime(); }
 float Blib::getFrameRate() { return ImGui::GetIO().Framerate; }
 float Blib::getDeltaTime() { return ImGui::GetIO().DeltaTime; }
+const char *Blib::SlurpFile(const char *path) {
+    FILE *fp = std::fopen(path, "rb");
+    if (!fp) {
+        std::fprintf(stderr, "Failed to open %s\n", path);
+        exit(1);
+    }
+
+    fseek(fp, 0, SEEK_END);
+    size_t sz = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    char *src = new char[sz + 1];
+    src[sz] = '\0';
+    size_t bytes_read = fread(src, sizeof(char), sz, fp);
+    if (bytes_read != sz) {
+        std::fprintf(stderr, "Failed to fully read content of %s\n", path);
+        exit(1);
+    }
+    fclose(fp);
+    return src;
+}
 
 void Blib::dbg(glm::vec3 vec) { std::cout << vec[0] << ' ' << vec[1] << ' ' << vec[2] << '\n'; }
 void Blib::dbg(glm::quat q) { std::cout << q[0] << ' ' << q[1] << ' ' << q[2] << ' ' << q[3] << '\n'; }
 void Blib::dbg(glm::mat4 mat) { for (size_t i = 0; i < 4; i++) std::cout << mat[i][0] << ' ' << mat[i][1] << ' ' << mat[i][2] << ' ' << mat[i][3] << '\n'; }
+void Blib::dbg(Blib::FrameData f) {
+    printf("idx%zu:\nFROM:%s\nTO:%s\nprogress:%f\n", f.idx, f.from.dump().c_str(), f.to.dump().c_str(), f.progress);
+}
 std::vector<float> Blib::toVector(glm::vec3 data) { return std::vector<float>{data[0], data[1], data[2]}; }
 std::vector<float> Blib::toVector(glm::quat data) { return std::vector<float>{data[0], data[1], data[2], data[3]}; }
 std::vector<float> Blib::toVector(glm::mat4 data) {

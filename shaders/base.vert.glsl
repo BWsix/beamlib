@@ -10,3 +10,4 @@ uniform mat4 projection;
 out vec3 Position;
 out vec3 Normal;
 out vec2 TexCoords;
+out vec3 TexCoords3D;

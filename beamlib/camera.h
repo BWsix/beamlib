@@ -20,7 +20,7 @@ class Camera : public Instance {
     float far = 100;
 
     float sensitivity = 0.05;
-    float movementSpeed = 5;
+    float movementSpeed = 10;
 
 public:
     using Instance::Instance;

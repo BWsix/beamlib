@@ -8,14 +8,20 @@
 !externals/
 !externals/**/*
 
+!animations/
+!animations/**/*
+
 !beamlib/
 !beamlib/**/*
 
-!editor/
-!editor/**/*
+!examples/
+!examples/**/*
 
 !models/
 !models/**/*
 
 !shaders/
 !shaders/**/*
+
+!textures/
+!textures/**/*

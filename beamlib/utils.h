@@ -1,5 +1,6 @@
 #pragma once
 
+#include "frameData.h"
 #include <vector>
 
 #include <imgui.h>
@@ -25,10 +26,12 @@ void EndUI();
 double getTimeElapsed();
 float getFrameRate();
 float getDeltaTime();
+const char *SlurpFile(const char *path);
 
 void dbg(glm::vec3 vec);
 void dbg(glm::quat q);
 void dbg(glm::mat4 mat);
+void dbg(FrameData f);
 std::vector<float> toVector(glm::vec3 data);
 std::vector<float> toVector(glm::quat data);
 std::vector<float> toVector(glm::mat4 data);
@@ -36,16 +39,13 @@ glm::vec3 vectorToVec3(std::vector<float> data);
 glm::quat vectorToQuat(std::vector<float> data);
 glm::mat4 vectorToMat4(std::vector<float> data);
 
-template<typename T>
-T lerp(T from, T to, float progress) {
-    return (1.0f - progress) * from + progress * to;
-}
-
-
 class Object {
 public:
     virtual void Update() = 0;
     virtual void Render() = 0;
 };
+
+inline const char* label(std::string& s) { return s.c_str(); }
+inline const char* label(std::string&& s) { return s.c_str(); }
 
 } // namespace beamlib

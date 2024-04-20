@@ -1,10 +1,14 @@
 #pragma once
 
 #include "model.h"
+#include "object.h"
 #include "shaderProgram.h"
 #include "texture.h"
+#include "utils.h"
 #include <map>
 #include <string>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 namespace Blib {
 
@@ -14,13 +18,18 @@ public:
     static std::map<std::string, ShaderProgram> Shaders;
     static std::map<std::string, Texture> Textures;
     static std::map<std::string, Model> Models;
+    static std::map<std::string, json> Animations;
+    static std::map<std::string, GLuint> GLuints;
 
-    static ShaderProgram LoadShader(std::string name, const char *vertexPath, const char *fragmentPath);
-    static ShaderProgram GetShader(std::string name) { return Shaders[name]; }
-    static Texture LoadTexture(std::string name, const char *file, bool alpha) { return Textures[name] = loadTextureFromFile(file, alpha); }
-    static Texture GetTexture(std::string name) { return Textures[name]; }
-    static Model LoadModel(std::string name, const char *path);
-    static Model GetModel(std::string name) { return Models[name]; }
+    static const ShaderProgram& LoadShader(std::string name, const char *vertexPath, const char *fragmentPath);
+    static const ShaderProgram& GetShader(std::string name) { return Shaders[name]; }
+    static const Texture& LoadTexture(std::string name, const char *file, bool alpha) { return Textures[name] = loadTextureFromFile(file, alpha); }
+    static const Texture& GetTexture(std::string name) { return Textures[name]; }
+    static const Model& LoadModel(std::string name, const char *path);
+    static const Model& GetModel(std::string name) { return Models[name]; }
+    static const json& LoadAnimation(std::string name, const char *path) { return Animations[name] = json::parse(SlurpFile(path)); }
+    static const json& GetAnimation(std::string name) { return Animations[name]; }
+    static GLuint& GetGLuint(std::string name) { return GLuints[name]; }
     static void Clear();
 
 private:

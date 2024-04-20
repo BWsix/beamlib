@@ -4,9 +4,10 @@ out vec4 FragColor;
 in vec3 Position;
 in vec3 Normal;
 in vec2 TexCoords;
+in vec3 TexCoords3D;
 
 struct Lighting {
-    // vec3 ambient;
+    vec3 ambient;
     vec3 diffuse;
 };
 

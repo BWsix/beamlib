@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils.h"
+#include "frameData.h"
 
 namespace Blib {
 
@@ -60,7 +61,7 @@ public:
         localRotationQuat = vectorToQuat(j["localRotationQuat"]);
         scale = vectorToVec3(j["scale"]);
     }
-    json Interpolator(json from, json to, float progress) {
+    json Interpolator(json& from, json& to, float progress) {
         return {
             {"position", toVector(lerp(vectorToVec3(from["position"]), vectorToVec3(to["position"]), progress))},
             {"rotationQuat", toVector(glm::slerp(vectorToQuat(from["rotationQuat"]), vectorToQuat(to["rotationQuat"]), progress))},

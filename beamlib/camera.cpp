@@ -1,11 +1,16 @@
 #include "camera.h"
+#include "imgui.h"
 #include "mouse.h"
 
 namespace Blib {
-Camera camera(NULL, "CAMERA");
+Camera camera("CAMERA");
 }
 
 void Blib::Camera::Update() {
+    if (ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard) {
+        return;
+    }
+
     if (Blib::mouse.getRightButtonPressed()) {
         yaw += sensitivity * Blib::mouse.getDeltaRight().x;
         pitch -= sensitivity * Blib::mouse.getDeltaRight().y;
