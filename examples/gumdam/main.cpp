@@ -3,24 +3,22 @@
 #include "grid.h"
 #include "skybox.h"
 
-bool devmode = false;
+bool devMode = false;
 
 int main() {
     const auto window = Blib::CreateWindow("gundam");
 
     glClearColor(0, 0, 0, 1);
     glEnable(GL_DEPTH_TEST);
-    glfwSetWindowSizeCallback(window, [](GLFWwindow *, int width, int height){
-        glViewport(0, 0, width, glm::max<int>(height, 1));
-        Blib::camera.setAspect((float)width / height);
-    });
 
-    Blib::camera.transform.Translate({0, 2, 14});
+    Blib::Instance scene("DEFAULT SCENE");
+    scene.PushChild(&Blib::camera);
 
     Gundam::LoadResources();
     Gundam gumdam;
+    scene.PushChild(&gumdam.root);
     gumdam.root.transform.Translate({0.0, 21.2, 0.0});
-    gumdam.idle();
+    gumdam.init();
 
     Skybox::LoadResources();
     Skybox skybox;
@@ -39,21 +37,26 @@ int main() {
         grid.render();
         gumdam.render();
 
+        if (!ImGui::GetIO().WantCaptureKeyboard) {
+            if (ImGui::IsKeyPressed(ImGuiKey_T)) devMode = !devMode;
+        }
+
         Blib::BeginUI();
         {
             ImGui::Begin("Info", NULL, ImGuiWindowFlags_AlwaysAutoResize);
             {
-                // ImGui::Text("fps: %.0f", glm::max<float>(120.0f, Blib::getFrameRate()));
                 ImGui::Text("fps: %.0f", Blib::getFrameRate());
                 ImGui::Text("frametime: %f", Blib::getDeltaTime());
+                ImGui::Text("dev mode: %s (press t to toggle)", devMode ? "on" : "off");
             }
             ImGui::End();
 
             gumdam.renderControlPanel();
-            if (devmode) {
+            if (devMode) {
                 ImGui::Begin("Objects");
                 {
                     gumdam.renderUI();
+                    Blib::camera.RenderUI();
                 }
                 ImGui::End();
             }

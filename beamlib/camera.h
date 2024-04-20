@@ -48,6 +48,7 @@ public:
         if (isFirstPersonMode()) {
             return glm::lookAt(transform.getLocalPosition(), transform.getLocalPosition() + getFront(), {0, 1, 0});
         } else {
+            // TODO: this might not be the correct way of getting position, but it works so... yeah
             return glm::lookAt(getTargetTranform()->getPosition() - radius * getFront(), getTargetTranform()->getPosition(), {0, 1, 0});
         }
     }

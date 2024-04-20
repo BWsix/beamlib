@@ -29,14 +29,17 @@ class Gundam {
 
 public:
     enum class State {
-        Idle, Walking, JumpingJack, Squating, GymbarGrabbing, GymbarPulling, PuruVictorying, Kemehanehaing,
+        Idle, Walking, JumpingJack, Squating, Gymbaring, PuruVictorying, Kemehanehaing,
     };
-
-    Blib::Instance root{"gumdam-root"};
-    Blib::Animator animator{"gundam animator", &body};
     State state = State::Idle;
 
+    Blib::Instance root{"gumdam-root"};
+    Blib::Animator gumdamAnimator{"gundam animator", &body};
+
+    Blib::Animator cameraAnimator{"camera animator", &Blib::camera};
+
     Gundam() {
+        Blib::camera.setTargetInstance(&root);
         root.PushChild(&body);
 
         body.PushChild(&head);
@@ -66,120 +69,235 @@ public:
         prog.SetMat4("view", Blib::camera.getViewMatrix());
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
 
-        animator.Update();
+        gumdamAnimator.Update();
+        cameraAnimator.Update();
         root.Render(prog);
 
-        if (state == State::GymbarGrabbing || state == State::GymbarPulling) {
+        if (state == State::Gymbaring) {
             gymbar.render();
         }
     }
 
     void renderUI() {
         ImGui::Begin("Gundam Animation Editor");
-        animator.renderUI();
+        gumdamAnimator.renderUI();
         ImGui::End();
-        root.RenderUI();
 
-        if (state == State::GymbarGrabbing || state == State::GymbarPulling) {
-            gymbar.renderUI();
-        }
+        ImGui::Begin("Camera Animation Editor");
+        cameraAnimator.renderUI();
+        ImGui::End();
+
+        root.RenderUI();
+        gymbar.renderUI();
     }
 
     void renderControlPanel() {
         ImGui::Begin("Gundam Control");
 
-        if (ImGui::Button("Idle##Gundam")) idle();
-        ImGui::SameLine();
-        if (ImGui::Button("Walk##Gundam")) walk();
-        ImGui::SameLine();
-        if (ImGui::Button("Jumping Jack##Gundam")) jumping_jack();
-        ImGui::SameLine();
-        if (ImGui::Button("Squat##Gundam")) squat();
+        if (state != State::Idle) {
+            if (state != State::PuruVictorying && state != State::Kemehanehaing) {
+                if (ImGui::Button("Stop##Gundam")) end();
+            }
+        } else {
+            if (ImGui::Button("Walk##Gundam")) walk();
+            ImGui::SameLine();
+            if (ImGui::Button("Jumping Jack##Gundam")) jumping_jack();
+            ImGui::SameLine();
+            if (ImGui::Button("Squat##Gundam")) squat();
+            ImGui::SameLine();
+            if (ImGui::Button("Gymnastic Bar##Gundam")) gymbaring();
 
-        if (ImGui::Button("Gymnastic Bar##Gundam")) gymbar_grabbing();
-        ImGui::SameLine();
-        if (ImGui::Button("Puru Victory##Gundam")) puru_victory();
-        ImGui::SameLine();
-        if (ImGui::Button("Kame hane ha##Gundam")) kamehaneha();
+            if (ImGui::Button("Puru Victory##Gundam")) puru_victory();
+            ImGui::SameLine();
+            if (ImGui::Button("Kame hane ha##Gundam")) kamehaneha();
+        }
 
         ImGui::End();
     }
 
-    void idle() {
-        if (animator.playing) animator.End();
-        animator.looping = false;
-        animator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-idle"));
+    void init() {
         state = State::Idle;
+
+        gumdamAnimator.looping = false;
+        gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-idle"));
+
+        cameraAnimator.looping = false;
+        cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle"));
     }
 
+    std::function<void()> end;
+
     void walk() {
-        if (animator.playing) animator.End();
-        animator.looping = true;
-        animator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-walking"));
-        animator.Play();
         state = State::Walking;
+
+        gumdamAnimator.looping = true;
+        gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-walking"));
+        gumdamAnimator.Play([&](){
+            gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-idle"));
+
+            cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-walking-to-idle"));
+            cameraAnimator.Play([&](){
+                state = State::Idle;
+            });
+        });
+
+        cameraAnimator.looping = false;
+        cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle-to-walking"));
+        cameraAnimator.Play();
+
+        end = [&](){
+            gumdamAnimator.End();
+        };
     }
 
     void jumping_jack() {
-        if (animator.playing) animator.End();
-        animator.looping = true;
-        animator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-jumping-jack"));
-        animator.Play();
         state = State::JumpingJack;
+
+        gumdamAnimator.looping = true;
+        gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-jumping-jack"));
+        gumdamAnimator.Play([&](){
+            gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-idle"));
+
+            cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-jumping-jack-to-idle"));
+            cameraAnimator.Play([&](){
+                state = State::Idle;
+            });
+        });
+
+        cameraAnimator.looping = false;
+        cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle-to-jumping-jack"));
+        cameraAnimator.Play();
+
+        end = [&](){
+            gumdamAnimator.End();
+        };
     }
 
     void squat() {
-        if (animator.playing) animator.End();
-        animator.looping = true;
-        animator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-squating"));
-        animator.Play();
         state = State::Squating;
+
+        gumdamAnimator.looping = true;
+        gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-squating"));
+        gumdamAnimator.Play([&](){
+            gumdamAnimator.looping = false;
+            gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-idle"));
+        });
+
+        cameraAnimator.looping = false;
+        cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle-to-squating"));
+        cameraAnimator.Play([&](){
+            cameraAnimator.looping = true;
+            cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-squating"));
+            cameraAnimator.Play([&](){
+                gumdamAnimator.looping = false;
+                cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle"));
+                state = State::Idle;
+            });
+        });
+
+        end = [&](){
+            gumdamAnimator.End();
+            cameraAnimator.End();
+        };
     }
     
-    void gymbar_grabbing() {
-        if (animator.playing) animator.End();
-        animator.looping = false;
-        animator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-gymbar-grabbing"));
-        animator.Play([&](){gymbar_pulling();});
-        state = State::GymbarGrabbing;
-    }
+    void gymbaring() {
+        state = State::Gymbaring;
 
-    void gymbar_pulling() {
-        animator.looping = true;
-        animator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-gymbar-pulling"));
-        animator.Play();
-        state = State::GymbarPulling;
+        gumdamAnimator.looping = false;
+        gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-gymbar-grabbing"));
+        gumdamAnimator.Play([&](){
+            gumdamAnimator.looping = true;
+            gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-gymbar-pulling"));
+            gumdamAnimator.Play([&](){
+                gumdamAnimator.looping = false;
+                gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-gymbar-ungrabbing"));
+                gumdamAnimator.Play([&](){
+                    gumdamAnimator.looping = false;
+                    gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-idle"));
+
+                    cameraAnimator.looping = false;
+                    cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-gymbar-to-idle"));
+                    cameraAnimator.Play([&](){
+                        state = State::Idle;
+                    });
+                });
+            });
+
+            cameraAnimator.looping = true;
+            cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-gymbar"));
+            cameraAnimator.Play();
+        });
+
+        cameraAnimator.looping = false;
+        cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle-to-gymbar"));
+        cameraAnimator.Play();
+
+        end = [&](){
+            gumdamAnimator.End();
+        };
     }
 
     void puru_victory() {
-        if (animator.playing) animator.End();
-        animator.looping = false;
-        animator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-puru-victory"));
-        animator.Play();
         state = State::PuruVictorying;
+
+        gumdamAnimator.looping = false;
+        gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-puru-victory"));
+        gumdamAnimator.Play();
+
+        cameraAnimator.looping = false;
+        cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle-to-puru-victory"));
+        cameraAnimator.Play([&](){
+            state = State::Idle;
+        });
     }
 
     void kamehaneha() {
-        if (animator.playing) animator.End();
-        animator.looping = false;
-        animator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-kamehaneha"));
-        animator.Play();
         state = State::Kemehanehaing;
+
+        gumdamAnimator.looping = false;
+        gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-kamehaneha"));
+        gumdamAnimator.Play([&](){
+            state = State::Idle;
+        });
+
+        cameraAnimator.looping = false;
+        cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle-to-kamehaneha"));
+        cameraAnimator.Play();
     }
 
     static void LoadResources() {
-        Gymbar::LoadResources();
 
         Blib::ResourceManager::LoadShader("gumdam", "shaders/gundam.vert.glsl", "shaders/gundam.frag.glsl");
 
-        Blib::ResourceManager::LoadAnimation("gumdam-idle", "animations/idle.json");
-        Blib::ResourceManager::LoadAnimation("gumdam-walking", "animations/walking-fast.json");
-        Blib::ResourceManager::LoadAnimation("gumdam-jumping-jack", "animations/jumping-jack.json");
-        Blib::ResourceManager::LoadAnimation("gumdam-squating", "animations/squating.json");
-        Blib::ResourceManager::LoadAnimation("gumdam-gymbar-grabbing", "animations/gymbar-grabbing.json");
-        Blib::ResourceManager::LoadAnimation("gumdam-gymbar-pulling", "animations/gymbar-pulling.json");
-        Blib::ResourceManager::LoadAnimation("gumdam-puru-victory", "animations/puru-victory.json");
-        Blib::ResourceManager::LoadAnimation("gumdam-kamehaneha", "animations/kamehaneha.json");
+        Blib::ResourceManager::LoadAnimation("gumdam-idle", "animations/gumdam-idle.json");
+        Blib::ResourceManager::LoadAnimation("camera-idle", "animations/camera-idle.json");
+
+        Blib::ResourceManager::LoadAnimation("gumdam-walking", "animations/gumdam-walking.json");
+        Blib::ResourceManager::LoadAnimation("camera-idle-to-walking", "animations/camera-idle-to-walking.json");
+        Blib::ResourceManager::LoadAnimation("camera-walking-to-idle", "animations/camera-walking-to-idle.json");
+
+        Blib::ResourceManager::LoadAnimation("gumdam-jumping-jack", "animations/gumdam-jumping-jack.json");
+        Blib::ResourceManager::LoadAnimation("camera-idle-to-jumping-jack", "animations/camera-idle-to-jumping-jack.json");
+        Blib::ResourceManager::LoadAnimation("camera-jumping-jack-to-idle", "animations/camera-jumping-jack-to-idle.json");
+
+        Blib::ResourceManager::LoadAnimation("gumdam-squating", "animations/gumdam-squating.json");
+        Blib::ResourceManager::LoadAnimation("camera-idle-to-squating", "animations/camera-idle-to-squating.json");
+        Blib::ResourceManager::LoadAnimation("camera-squating", "animations/camera-squating.json");
+
+        Gymbar::LoadResources();
+        Blib::ResourceManager::LoadAnimation("gumdam-gymbar-grabbing", "animations/gumdam-gymbar-grabbing.json");
+        Blib::ResourceManager::LoadAnimation("gumdam-gymbar-pulling", "animations/gumdam-gymbar-pulling.json");
+        Blib::ResourceManager::LoadAnimation("gumdam-gymbar-ungrabbing", "animations/gumdam-gymbar-ungrabbing.json");
+        Blib::ResourceManager::LoadAnimation("camera-idle-to-gymbar", "animations/camera-idle-to-gymbar.json");
+        Blib::ResourceManager::LoadAnimation("camera-gymbar", "animations/camera-gymbar.json");
+        Blib::ResourceManager::LoadAnimation("camera-gymbar-to-idle", "animations/camera-gymbar-to-idle.json");
+
+        Blib::ResourceManager::LoadAnimation("gumdam-puru-victory", "animations/gumdam-puru-victory.json");
+        Blib::ResourceManager::LoadAnimation("camera-idle-to-puru-victory", "animations/camera-idle-to-puru-victory.json");
+
+        Blib::ResourceManager::LoadAnimation("gumdam-kamehaneha", "animations/gumdam-kamehaneha.json");
+        Blib::ResourceManager::LoadAnimation("camera-idle-to-kamehaneha", "animations/camera-idle-to-kamehaneha.json");
 
         Blib::ResourceManager::LoadModel("gumdam-back", "models/gundam/back.obj");
         Blib::ResourceManager::LoadModel("gumdam-body", "models/gundam/body.obj");

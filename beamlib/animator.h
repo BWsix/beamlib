@@ -128,6 +128,7 @@ public:
                 {"easingFunc", EaseFunc::Lerp},
                 {"absoluteDuration", 0.0},
             }));
+            frameManager.loadFrames(frames);
         }
 
         ImGui::SameLine();

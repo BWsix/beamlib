@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "camera.h"
 
 #include <iostream>
 
@@ -22,7 +23,6 @@ GLFWwindow *Blib::CreateWindow(const char *title, int width, int height) {
     glfwSetErrorCallback([](int error, const char *description) {
         std::fprintf(stderr, "GLFW Error %d: %s\n", error, description);
     });
-
     assert(glfwInit() && "Failed to initialize GLFW ._.");
 
     // GL 4.5 + GLSL 450
@@ -36,6 +36,11 @@ GLFWwindow *Blib::CreateWindow(const char *title, int width, int height) {
     assert(window && "Failed to create window ._.");
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
+
+    glfwSetWindowSizeCallback(window, [](GLFWwindow *, int width, int height){
+        glViewport(0, 0, width, glm::max<int>(height, 1));
+        Blib::camera.setAspect((float)width / height);
+    });
 
     // setup GLAD
     assert(gladLoadGL(glfwGetProcAddress) && "Something went wrong with glad ._.");
