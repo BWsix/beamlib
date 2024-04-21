@@ -1,14 +1,15 @@
 #pragma once
 
 #include "easings.h"
+#include "frame.h"
 #include "frameData.h"
 #include "imgui.h"
-#include "utils.h"
 #include "instance.h"
-#include <functional>
-#include <iterator>
-#include "frame.h"
+#include "utils.h"
 #include <fstream>
+#include <functional>
+#include <iostream>
+#include <iterator>
 
 namespace Blib {
 
@@ -122,8 +123,10 @@ public:
 
         ImGui::SameLine();
         if (ImGui::Button(label("New Frame##ui" + name))) {
+            json j;
+            j[instance->name] = instance->Serialize();
             frames.push_back(Frame({
-                {"data", instance->Serialize()},
+                {"data", j},
                 {"duration", 1.0},
                 {"easingFunc", EaseFunc::Lerp},
                 {"absoluteDuration", 0.0},
@@ -167,20 +170,24 @@ public:
             if (i == currentActiveFrameIdx) {
                 ImGui::SameLine();
                 if (ImGui::Button(label("Save##ui" + std::to_string(i) + name))) {
-                    frames[i].data = instance->Serialize();
+                    frames[i].data[instance->name] = instance->Serialize();
                     frameManager.loadFrames(frames);
                 }
 
                 ImGui::SameLine();
                 if (ImGui::Button(label(" ^ Duplicate##ui" + std::to_string(i) + name))) {
-                    frames.insert(frames.begin() + i, Frame({ {"data", instance->Serialize()}, {"duration", frames[i].duration}, {"easingFunc", frames[i].easingFunc}, {"absoluteDuration", 0.0} }));
+                    json j;
+                    j[instance->name] = instance->Serialize();
+                    frames.insert(frames.begin() + i, Frame({ {"data", j}, {"duration", frames[i].duration}, {"easingFunc", frames[i].easingFunc}, {"absoluteDuration", 0.0} }));
                     frameManager.loadFrames(frames);
                     currentActiveFrameIdx += 1;
                 }
 
                 ImGui::SameLine();
                 if (ImGui::Button(label(" v Duplicate##ui" + std::to_string(i) + name))) {
-                    frames.insert(frames.begin() + i + 1, Frame({ {"data", instance->Serialize()}, {"duration", frames[i].duration}, {"easingFunc", frames[i].easingFunc}, {"absoluteDuration", 0.0} }));
+                    json j;
+                    j[instance->name] = instance->Serialize();
+                    frames.insert(frames.begin() + i + 1, Frame({ {"data", j}, {"duration", frames[i].duration}, {"easingFunc", frames[i].easingFunc}, {"absoluteDuration", 0.0} }));
                     frameManager.loadFrames(frames);
                 }
 
@@ -218,7 +225,7 @@ public:
     }
 
     void Load(const Frame& f) {
-        instance->Load(f.data);
+        instance->Load(f.data[instance->name]);
     }
 
     void LoadJson(const json& j) {
@@ -244,7 +251,7 @@ public:
         auto framedata = frameManager.getFrame(timeElapsed, looping);
         currentActiveFrameIdx = framedata.idx;
 
-        json frame = instance->Interpolator(framedata.from, framedata.to, ease(framedata.func, framedata.progress));
+        json frame = instance->Interpolator(framedata.from[instance->name], framedata.to[instance->name], ease(framedata.func, framedata.progress));
         instance->Load(frame);
 
         timeElapsed += getDeltaTime();

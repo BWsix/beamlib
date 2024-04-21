@@ -11,11 +11,11 @@
 namespace Blib {
 
 class Instance {
-protected:
+public:
     Model model;
     std::vector<Instance *> children;
+    std::map<std::string, Instance *> children_mapper;
 
-public:
     Transform transform;
     std::string name;
 
@@ -27,11 +27,9 @@ public:
     virtual json CustomSerialize() { return {}; };
     json Serialize() {
         json j;
-        j["name"] = name;
         j["transform"] = transform.SerializeModel();
-        j["children"] = json::array();
         j["data"] = CustomSerialize();
-        for (auto child : children) j["children"].emplace_back(child->Serialize());
+        for (auto child : children) j["children"][child->name] = child->Serialize();
         return j;
     }
 
@@ -42,7 +40,7 @@ public:
             CustomLoad(j["data"]);
         }
         for (size_t i = 0; i < children.size(); i++) {
-            children[i]->Load(j["children"][i]);
+            children[i]->Load(j["children"][children[i]->name]);
         }
     }
 
@@ -52,12 +50,10 @@ public:
     }
     json Interpolator(json& from, json& to, float progress) {
         json j;
-        j["name"] = from["name"];
         j["transform"] = transform.Interpolator(from["transform"], to["transform"], progress);
-        j["children"] = json::array();
         j["data"] = CustomInterpolator(from["data"], to["data"], progress);
-        for (size_t i = 0; i < children.size(); i++) {
-            j["children"].emplace_back(children[i]->Interpolator(from["children"][i], to["children"][i], progress));
+        for (auto& elem : from["children"].items()) {
+            j["children"][elem.key()] = children_mapper[elem.key()]->Interpolator(from["children"][elem.key()], to["children"][elem.key()], progress);
         }
         return j;
     }
@@ -68,12 +64,14 @@ public:
         for (auto child : children) child->Update();
     }
 
-    virtual void CustomRender() {}
-    virtual void Render(ShaderProgram& shader) {
-        CustomRender();
-        shader.SetMat4("model", transform.getModelMatrix());
-        model.draw(shader);
-        for (auto child : children) child->Render(shader);
+    virtual void CustomRender(ShaderProgram prog) {
+        prog.Use();
+        prog.SetMat4("model", transform.getModelMatrix());
+        model.draw(prog);
+    }
+    virtual void Render(ShaderProgram prog) {
+        CustomRender(prog);
+        for (auto child : children) child->Render(prog);
     }
     virtual void CustomRenderUI() {}
     virtual void RenderUI() {

@@ -7,5 +7,6 @@ void Blib::Instance::PushChild(Instance *child) {
     child->transform.setParent(&transform);
     instanceStore.insert({child->name, child});
     children.push_back(child);
+    children_mapper[child->name] = child;
 }
 }

@@ -1,13 +1,26 @@
 #pragma once
 
 #include "gymbar.h"
+#include <string>
 #include <beamlib.h>
+
+class LazerInstance : public Blib::Instance {
+public:
+    using Blib::Instance::Instance;
+
+    void CustomRender(Blib::ShaderProgram prog) override {
+        prog = Blib::ResourceManager::GetShader("gumdam-lazer");
+        prog.Use();
+        prog.SetMat4("model", transform.getModelMatrix());
+        prog.SetMat4("view", Blib::camera.getViewMatrix());
+        prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
+        model.draw(prog);
+    }
+};
 
 class Gundam {
     Blib::Instance body{"body", Blib::ResourceManager::GetModel("gumdam-body")};
         Blib::Instance head{"head", Blib::ResourceManager::GetModel("gumdam-head")};
-        Blib::Instance beam{"beam", Blib::ResourceManager::GetModel("gumdam-beam")};
-        Blib::Instance ball{"ball", Blib::ResourceManager::GetModel("gumdam-ball")};
         Blib::Instance back{"back", Blib::ResourceManager::GetModel("gumdam-back")};
         Blib::Instance lshouder{"lshouder", Blib::ResourceManager::GetModel("gumdam-lshouder")};
             Blib::Instance ulefthand{"ulefthand", Blib::ResourceManager::GetModel("gumdam-ulefthand")};
@@ -24,6 +37,8 @@ class Gundam {
             Blib::Instance urightleg{"urightleg", Blib::ResourceManager::GetModel("gumdam-urightleg")};
                 Blib::Instance drightleg{"drightleg", Blib::ResourceManager::GetModel("gumdam-drightleg")};
                     Blib::Instance rightfoot{"rightfoot", Blib::ResourceManager::GetModel("gumdam-rightfoot")};
+        LazerInstance lazer{"beam", Blib::ResourceManager::GetModel("gumdam-lazer")};
+        LazerInstance fireball{"ball", Blib::ResourceManager::GetModel("gumdam-fireball")};
 
     Gymbar gymbar;
 
@@ -43,8 +58,6 @@ public:
         root.PushChild(&body);
 
         body.PushChild(&head);
-        body.PushChild(&beam);
-        body.PushChild(&ball);
         body.PushChild(&back);
         body.PushChild(&lshouder);
             lshouder.PushChild(&ulefthand);
@@ -61,6 +74,8 @@ public:
             dbody.PushChild(&uleftleg);
                 uleftleg.PushChild(&dleftleg);
                     dleftleg.PushChild(&leftfoot);
+        body.PushChild(&lazer);
+        body.PushChild(&fireball);
     }
 
     void render() {
@@ -267,8 +282,8 @@ public:
     }
 
     static void LoadResources() {
-
         Blib::ResourceManager::LoadShader("gumdam", "shaders/gundam.vert.glsl", "shaders/gundam.frag.glsl");
+        Blib::ResourceManager::LoadShader("gumdam-lazer", "shaders/lazer.vert.glsl", "shaders/lazer.frag.glsl");
 
         Blib::ResourceManager::LoadAnimation("gumdam-idle", "animations/gumdam-idle.json");
         Blib::ResourceManager::LoadAnimation("camera-idle", "animations/camera-idle.json");
@@ -318,7 +333,7 @@ public:
         Blib::ResourceManager::LoadModel("gumdam-urighthand", "models/gundam/urighthand.obj");
         Blib::ResourceManager::LoadModel("gumdam-urightleg", "models/gundam/urightleg.obj");
 
-        Blib::ResourceManager::LoadModel("gumdam-beam", "models/gundam/beam.obj");
-        Blib::ResourceManager::LoadModel("gumdam-ball", "models/gundam/ball.obj");
+        Blib::ResourceManager::LoadModel("gumdam-lazer", "models/lazer/lazer.obj");
+        Blib::ResourceManager::LoadModel("gumdam-fireball", "models/fireball/fireball.obj");
     }
 };
