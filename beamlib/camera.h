@@ -17,7 +17,7 @@ class Camera : public Instance {
     float fovy = 45;
     float aspect = 800.0 / 600;
     float near = 0.1;
-    float far = 100;
+    float far = 150;
 
     float sensitivity = 0.05;
     float movementSpeed = 10;

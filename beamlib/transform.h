@@ -21,7 +21,7 @@ public:
     void Rotate(glm::quat quat) { rotationQuat *= quat; }
     void RotateLocal(glm::quat quat) { localRotationQuat *= quat; }
     void RotateLocal(glm::vec3 euler) { Rotate(glm::quat(euler)); }
-    void Scale(glm::vec3 scale) { scale *= scale; }
+    void Scale(glm::vec3 scale) { this->scale *= scale; }
     void ScaleLocal(glm::vec3 scale) { localScale *= scale; }
 
     glm::vec3 getPosition() const { return rotationQuat * (parent ? parent->getPosition() + position : position); }
