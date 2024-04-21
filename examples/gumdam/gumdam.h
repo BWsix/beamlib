@@ -151,9 +151,8 @@ public:
             gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-idle"));
 
             cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-walking-to-idle"));
-            cameraAnimator.Play([&](){
-                state = State::Idle;
-            });
+            cameraAnimator.Play();
+            state = State::Idle;
         });
 
         cameraAnimator.looping = false;
@@ -174,9 +173,8 @@ public:
             gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-idle"));
 
             cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-jumping-jack-to-idle"));
-            cameraAnimator.Play([&](){
-                state = State::Idle;
-            });
+            cameraAnimator.Play();
+            state = State::Idle;
         });
 
         cameraAnimator.looping = false;
@@ -233,9 +231,8 @@ public:
 
                     cameraAnimator.looping = false;
                     cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-gymbar-to-idle"));
-                    cameraAnimator.Play([&](){
-                        state = State::Idle;
-                    });
+                    cameraAnimator.Play();
+                    state = State::Idle;
                 });
             });
 
