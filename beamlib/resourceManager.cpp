@@ -1,6 +1,7 @@
 #include "resourceManager.h"
 #include "model.h"
 #include "stb_image.h"
+#include <iostream>
 
 namespace Blib {
 
@@ -11,12 +12,16 @@ std::map<std::string, json> ResourceManager::Animations;
 std::map<std::string, GLuint> ResourceManager::GLuints;
 
 const ShaderProgram& ResourceManager::LoadShader(std::string name, const char *vertexPath, const char *fragmentPath) {
+    std::cout << "Loading Shader: " + name + "\n";
+
     auto prog = ShaderProgram();
     prog.Compile(vertexPath, fragmentPath);
     return ResourceManager::Shaders[name] = prog;
 }
 
 const Model& ResourceManager::LoadModel(std::string name, const char *path) {
+    std::cout << "Loading Model: " + name + "\n";
+
     auto m = Model();
     m.load(path);
     return ResourceManager::Models[name] = m;
@@ -28,6 +33,8 @@ void ResourceManager::Clear() {
 }
 
 Texture ResourceManager::loadTextureFromFile(const char *file, bool alpha) {
+    std::cout << "Loading Texture: " + std::string(file) + "\n";
+
     Texture texture;
 
     if (alpha) {

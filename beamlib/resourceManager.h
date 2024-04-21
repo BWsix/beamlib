@@ -9,6 +9,7 @@
 #include <string>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+#include <iostream>
 
 namespace Blib {
 
@@ -27,7 +28,10 @@ public:
     static const Texture& GetTexture(std::string name) { return Textures[name]; }
     static const Model& LoadModel(std::string name, const char *path);
     static const Model& GetModel(std::string name) { return Models[name]; }
-    static const json& LoadAnimation(std::string name, const char *path) { return Animations[name] = json::parse(SlurpFile(path)); }
+    static const json& LoadAnimation(std::string name, const char *path) {
+        std::cout << "Loading Animation: " + name + "\n";
+        return Animations[name] = json::parse(SlurpFile(path)); 
+    }
     static const json& GetAnimation(std::string name) { return Animations[name]; }
     static GLuint& GetGLuint(std::string name) { return GLuints[name]; }
     static void Clear();

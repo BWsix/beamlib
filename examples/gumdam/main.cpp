@@ -6,6 +6,34 @@
 
 bool devMode = false;
 
+void TextCentered(const std::string& text) {
+    float windowWidth = ImGui::GetWindowSize().x;
+    float textWidth = ImGui::CalcTextSize(text.c_str()).x;
+
+    ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+    ImGui::Text("%s", text.c_str());
+}
+
+void renderLoadingScreen(GLFWwindow* window, std::string message) {
+    glfwPollEvents();
+    Blib::BeginUI();
+
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+    ImGuiIO& io = ImGui::GetIO();
+    float display_w = io.DisplaySize.x;
+    float display_h = io.DisplaySize.y;
+
+    ImGui::SetNextWindowSize(ImVec2(display_w, display_h));
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+
+    ImGui::Begin("Fullscreen Window", nullptr, window_flags);
+    TextCentered(message);
+    ImGui::End();
+
+    Blib::EndUI();
+    glfwSwapBuffers(window);
+}
+
 int main() {
     const auto window = Blib::CreateWindow("gundam");
 
@@ -14,8 +42,12 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    renderLoadingScreen(window, "Loading.");
+
     Blib::Instance scene("DEFAULT SCENE");
     scene.PushChild(&Blib::camera);
+
+    renderLoadingScreen(window, "Loading..");
 
     Gundam::LoadResources();
     Gundam gumdam;
@@ -23,8 +55,12 @@ int main() {
     gumdam.root.transform.Translate({0.0, 21.2, 0.0});
     gumdam.init();
 
+    renderLoadingScreen(window, "Loading...");
+
     Skybox::LoadResources();
     Skybox skybox;
+
+    renderLoadingScreen(window, "Loading....");
 
     Lilypad::LoadResources();
     Lilypad lilypad;
