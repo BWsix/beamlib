@@ -13,3 +13,6 @@
 [submodule "externals/assimp"]
 	path = externals/assimp
 	url = https://github.com/assimp/assimp
+[submodule "externals/OpenMesh"]
+	path = externals/OpenMesh
+	url = https://gitlab.vci.rwth-aachen.de:9000/OpenMesh/OpenMesh.git
