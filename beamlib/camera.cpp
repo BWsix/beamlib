@@ -2,6 +2,9 @@
 #include "imgui.h"
 #include "mouse.h"
 
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
 namespace Blib {
 Camera camera("CAMERA");
 }
@@ -11,9 +14,9 @@ void Blib::Camera::Update() {
         return;
     }
 
-    if (Blib::mouse.getRightButtonPressed()) {
-        yaw += sensitivity * Blib::mouse.getDeltaRight().x;
-        pitch -= sensitivity * Blib::mouse.getDeltaRight().y;
+    if (Blib::mouse.getButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
+        yaw += sensitivity * Blib::mouse.getDeltaButton(GLFW_MOUSE_BUTTON_MIDDLE).x;
+        pitch -= sensitivity * Blib::mouse.getDeltaButton(GLFW_MOUSE_BUTTON_MIDDLE).y;
         if (pitch > 89.0f) {
             pitch = 89.0f;
         }

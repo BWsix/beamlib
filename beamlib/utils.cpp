@@ -23,7 +23,9 @@ GLFWwindow *Blib::CreateWindow(const char *title, int width, int height) {
     glfwSetErrorCallback([](int error, const char *description) {
         std::fprintf(stderr, "GLFW Error %d: %s\n", error, description);
     });
-    assert(glfwInit() && "Failed to initialize GLFW ._.");
+    if (!glfwInit()){
+        fprintf(stderr, "Failed to initialize GLFW ._.\n");
+    }
 
     // GL 4.5 + GLSL 450
     const char *glsl_version = "#version 450";
@@ -37,13 +39,10 @@ GLFWwindow *Blib::CreateWindow(const char *title, int width, int height) {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    glfwSetWindowSizeCallback(window, [](GLFWwindow *, int width, int height){
-        glViewport(0, 0, width, glm::max<int>(height, 1));
-        Blib::camera.setAspect((float)width / height);
-    });
-
     // setup GLAD
-    assert(gladLoadGL(glfwGetProcAddress) && "Something went wrong with glad ._.");
+    if (!gladLoadGL(glfwGetProcAddress)) {
+        fprintf(stderr, "Something went wrong with glad ._.\n");
+    }
 
     // setup imgui
     IMGUI_CHECKVERSION();
@@ -61,6 +60,7 @@ GLFWwindow *Blib::CreateWindow(const char *title, int width, int height) {
 }
 
 bool Blib::WindowShouldClose(GLFWwindow *window) {
+    glfwPollEvents();
     return glfwWindowShouldClose(window);
 }
 

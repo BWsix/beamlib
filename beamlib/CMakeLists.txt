@@ -26,9 +26,9 @@ add_library(beamlib
     utils.cpp
     utils.h
 )
-target_link_libraries(beamlib PRIVATE glad glfw glm imgui nlohmann_json assimp stb)
+target_link_libraries(beamlib PUBLIC glad glfw glm imgui nlohmann_json assimp stb)
 target_include_directories(beamlib PUBLIC "include/")
 
 if(UNIX)
-target_compile_options(beamlib PRIVATE "-Wall" "-Wextra" "-ggdb")
+target_compile_options(beamlib PRIVATE "-Wall" "-Wextra" "-ggdb" "-Wno-error")
 endif()

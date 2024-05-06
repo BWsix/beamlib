@@ -43,6 +43,7 @@ public:
     }
     Transform *getTargetTranform() const { return &targetInstance->transform; }
 
+    void setMovementSpeed(float speed) { movementSpeed = speed; }
     glm::vec3 getFront() const { return glm::vec3(cos(glm::radians(yaw)) * cos(glm::radians(pitch)), sin(glm::radians(pitch)), sin(glm::radians(yaw)) * cos(glm::radians(pitch))); }
     glm::mat4 getViewMatrix() const {
         if (isFirstPersonMode()) {
