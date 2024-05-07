@@ -17,6 +17,9 @@ using json = nlohmann::json;
 
 namespace Blib {
 
+extern int WIDTH;
+extern int HEIGHT;
+
 GLFWwindow *CreateWindow(const char *title, int width = 800, int height = 600);
 bool WindowShouldClose(GLFWwindow *window);
 void DestroyWindow(GLFWwindow *window);
@@ -27,6 +30,9 @@ double getTimeElapsed();
 float getFrameRate();
 float getDeltaTime();
 const char *SlurpFile(const char *path);
+
+void useFrameBuffer();
+void useFrameBuffer(const std::string& id);
 
 void dbg(glm::vec3 vec);
 void dbg(glm::quat q);

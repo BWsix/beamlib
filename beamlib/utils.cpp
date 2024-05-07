@@ -1,5 +1,6 @@
 #include "utils.h"
 #include "camera.h"
+#include "resourceManager.h"
 
 #include <iostream>
 
@@ -16,6 +17,11 @@
 #include <glm/gtx/quaternion.hpp>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+
+namespace Blib {
+    int WIDTH = 800;
+    int HEIGHT = 600;
+}
 
 GLFWwindow *Blib::CreateWindow(const char *title, int width, int height) {
     GLFWwindow *window;
@@ -131,4 +137,15 @@ glm::mat4 Blib::vectorToMat4(std::vector<float> data) {
     glm::mat4 m;
     for (size_t i = 0; i < 16; i++) glm::value_ptr(m)[i] = data[i];
     return m;
+}
+
+void Blib::useFrameBuffer() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Blib::useFrameBuffer(const std::string& id) {
+    GLuint& custom_framebuffer_object = ResourceManager::GetGLuint(id);
+    glBindFramebuffer(GL_FRAMEBUFFER, custom_framebuffer_object);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
