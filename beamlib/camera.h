@@ -15,7 +15,7 @@ class Camera : public Instance {
     float radius = 5;
 
     float fovy = 45;
-    float aspect = 800.0 / 600;
+    float aspect = (float)Blib::WIDTH / Blib::HEIGHT;
     float near = 0.1;
     float far = 150;
 

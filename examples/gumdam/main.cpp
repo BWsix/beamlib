@@ -8,6 +8,8 @@ void generateTexture(GLuint &id, int width, int height, int color_attachment) {
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glFramebufferTexture(GL_FRAMEBUFFER, color_attachment, id, 0);
@@ -35,8 +37,8 @@ void setup() {
 
     GLuint& custom_render_buffer_id = Blib::ResourceManager::GetGLuint("custom-render-buffer-id");
     GLuint& custom_texture_id = Blib::ResourceManager::GetGLuint("custom-screen-texture");
-    generateTexture(custom_texture_id, 800, 600, GL_COLOR_ATTACHMENT0);
-    generateRenderBuffer(custom_render_buffer_id, 800, 600);
+    generateTexture(custom_texture_id, Blib::WIDTH, Blib::HEIGHT, GL_COLOR_ATTACHMENT0);
+    generateRenderBuffer(custom_render_buffer_id, Blib::WIDTH, Blib::HEIGHT);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!\n";
         exit(1);
@@ -47,10 +49,12 @@ void setup() {
 bool devMode = false;
 
 int main() {
-    const auto window = Blib::CreateWindow("gundam");
+    const auto window = Blib::CreateWindow("gundam", Blib::WIDTH, Blib::HEIGHT);
 
     glfwSetWindowSizeCallback(window, [](GLFWwindow *, int width, int height){
         glViewport(0, 0, width, glm::max<int>(height, 1));
+        Blib::WIDTH = width;
+        Blib::HEIGHT = height;
         Blib::camera.setAspect((float)Blib::WIDTH / Blib::HEIGHT);
 
         GLuint& custom_framebuffer_object = Blib::ResourceManager::GetGLuint("custom-fbo");
@@ -126,7 +130,7 @@ int main() {
                 ImGui::Text("frametime: %f", Blib::getDeltaTime());
                 ImGui::Text("dev mode: %s (press t to toggle)", devMode ? "on" : "off");
                 ImGui::Checkbox("Enable Pixelation", &pixelation);
-                ImGui::SliderInt("Size", &pixelation_size, 1, Blib::HEIGHT);
+                ImGui::SliderInt("Size", &pixelation_size, 1, 50);
             }
             ImGui::End();
 

@@ -19,8 +19,8 @@
 using json = nlohmann::json;
 
 namespace Blib {
-    int WIDTH = 800;
-    int HEIGHT = 600;
+    int WIDTH = 1920;
+    int HEIGHT = 1080;
 }
 
 GLFWwindow *Blib::CreateWindow(const char *title, int width, int height) {
@@ -43,7 +43,7 @@ GLFWwindow *Blib::CreateWindow(const char *title, int width, int height) {
     window = glfwCreateWindow(width, height, title, NULL, NULL);
     assert(window && "Failed to create window ._.");
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     // setup GLAD
     if (!gladLoadGL(glfwGetProcAddress)) {

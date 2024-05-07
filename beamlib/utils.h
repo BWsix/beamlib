@@ -20,7 +20,7 @@ namespace Blib {
 extern int WIDTH;
 extern int HEIGHT;
 
-GLFWwindow *CreateWindow(const char *title, int width = 800, int height = 600);
+GLFWwindow *CreateWindow(const char *title, int width, int height);
 bool WindowShouldClose(GLFWwindow *window);
 void DestroyWindow(GLFWwindow *window);
 void BeginUI();
