@@ -48,7 +48,7 @@ void setupFramebuffer() {
 void init() {
     setupFramebuffer();
 
-    if (!mesh.LoadFromFile("models/gragon/xyzrgb_dragon_100k.obj")) {
+    if (!mesh.LoadFromFile("models/dragon/xyzrgb_dragon_100k.obj")) {
         fprintf(stderr, "failed to load model\n");
         exit(1);
     } else {
@@ -58,7 +58,7 @@ void init() {
 }
 
 int main() {
-    const auto window = Blib::CreateWindow("texture editor");
+    const auto window = Blib::CreateWindow("texture editor", Blib::WIDTH, Blib::HEIGHT);
     glfwSetWindowSizeCallback(window, [](GLFWwindow *, int width, int height) {
         WIDTH = width;
         HEIGHT = height;
