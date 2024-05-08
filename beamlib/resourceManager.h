@@ -23,11 +23,11 @@ public:
     static std::map<std::string, GLuint> GLuints;
 
     static const ShaderProgram& LoadShader(std::string name, const char *vertexPath, const char *fragmentPath);
-    static const ShaderProgram& GetShader(std::string name) { return Shaders[name]; }
+    static const ShaderProgram& GetShader(std::string name) { return Shaders.at(name); }
     static const Texture& LoadTexture(std::string name, const char *file, bool alpha) { return Textures[name] = loadTextureFromFile(file, alpha); }
-    static const Texture& GetTexture(std::string name) { return Textures[name]; }
+    static const Texture& GetTexture(std::string name) { return Textures.at(name); }
     static const Model& LoadModel(std::string name, const char *path);
-    static const Model& GetModel(std::string name) { return Models[name]; }
+    static const Model& GetModel(std::string name) { return Models.at(name); }
     static const json& LoadAnimation(std::string name, const char *path) {
         std::cout << "Loading Animation: " + name + "\n";
         return Animations[name] = json::parse(SlurpFile(path)); 

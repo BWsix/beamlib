@@ -4,7 +4,8 @@
 
 void Blib::Model::loadModel(std::string path) {
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    importer.SetPropertyFloat("PP_GSN_MAX_SMOOTHING_ANGLE", 90);
+    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cout << importer.GetErrorString() << std::endl;
