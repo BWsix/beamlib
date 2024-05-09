@@ -6,7 +6,7 @@ struct {
     glm::vec3 objectColor = glm::vec3(1.0);
     glm::vec3 lightColor = glm::vec3(1.0);
 
-    float toonThreshold = 0.1;
+    float toonThreshold = 0.7;
 } config;
 
 int main() {
@@ -22,7 +22,8 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     Blib::camera.setMovementSpeed(2);
-    Blib::camera.transform.Translate({0.0, 0.0, 5.0});
+    Blib::camera.transform.Translate({0.0, 2.0, 5.0});
+    Blib::camera.setPitch(-26.1);
 
     Ball::LoadResources();
     Ball lightball;
@@ -31,7 +32,7 @@ int main() {
 
     Dragon::LoadResources();
     Dragon dragon;
-    dragon.transform.Scale({10, 10, 10});
+    dragon.transform.Scale({5, 5, 5});
 
     Screen::LoadResources();
     Screen screen;
@@ -47,28 +48,31 @@ int main() {
         Blib::mouse.Update(window);
         Blib::camera.Update();
 
-        // screen.bind();
+        dragon.transform.RotateLocal({0.0, Blib::getDeltaTime(), 0.0});
+
+        screen.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.8, 0.4, 0.4, 1);
 
-        auto& prog = programs.phong;
+        auto& prog = programs.toon;
         prog.Use();
         prog.SetVec3("viewPos", Blib::camera.transform.getPosition());
-        prog.SetVec3("lightPos", lightball.transform.getPosition());
+        // prog.SetVec3("lightPos", lightball.transform.getPosition());
+        prog.SetVec3("lightPos", Blib::camera.transform.getPosition());
         prog.SetVec3("objectColor", config.objectColor);
         prog.SetVec3("lightColor", config.lightColor);
         dragon.render(prog);
 
-        programs.light.Use();
-        programs.light.SetVec3("lightColor", config.lightColor);
-        lightball.render(programs.light);
+        // programs.light.Use();
+        // programs.light.SetVec3("lightColor", config.lightColor);
+        // lightball.render(programs.light);
 
-        // screen.unbind();
-        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        screen.unbind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // programs.screen.Use();
-        // programs.screen.SetFloat("threshold", config.toonThreshold);
-        // screen.render(programs.screen);
+        programs.screen.Use();
+        programs.screen.SetFloat("threshold", config.toonThreshold);
+        screen.render(programs.screen);
 
         Blib::BeginUI();
         ImGui::Begin("Config");
