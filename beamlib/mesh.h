@@ -17,8 +17,10 @@ struct Texture {
 };
 
 struct Lighting {
-    // glm::vec3 ambientColor; // Ka
-    glm::vec3 diffuseColor; // Kd
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float shininess;
 };
 
 class Mesh {

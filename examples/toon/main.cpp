@@ -47,11 +47,11 @@ int main() {
         Blib::mouse.Update(window);
         Blib::camera.Update();
 
-        screen.bind();
+        // screen.bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.8, 0.4, 0.4, 1);
 
-        auto& prog = programs.toon;
+        auto& prog = programs.phong;
         prog.Use();
         prog.SetVec3("viewPos", Blib::camera.transform.getPosition());
         prog.SetVec3("lightPos", lightball.transform.getPosition());
@@ -63,12 +63,12 @@ int main() {
         programs.light.SetVec3("lightColor", config.lightColor);
         lightball.render(programs.light);
 
-        screen.unbind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // screen.unbind();
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        programs.screen.Use();
-        programs.screen.SetFloat("threshold", config.toonThreshold);
-        screen.render(programs.screen);
+        // programs.screen.Use();
+        // programs.screen.SetFloat("threshold", config.toonThreshold);
+        // screen.render(programs.screen);
 
         Blib::BeginUI();
         ImGui::Begin("Config");

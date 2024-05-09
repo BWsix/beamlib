@@ -50,7 +50,7 @@ const float skyboxVertices[] = {
 class Skybox {
 public:
     void render() {
-        glDepthMask(false);
+        glDepthFunc(GL_LEQUAL);
         auto prog = Blib::ResourceManager::GetShader("skybox");
         prog.Use();
         glm::mat4 view = glm::mat4(glm::mat3(Blib::camera.getViewMatrix()));  
@@ -60,7 +60,7 @@ public:
         glBindVertexArray(Blib::ResourceManager::GetGLuint("skybox-vao"));
         glBindTexture(GL_TEXTURE_CUBE_MAP, Blib::ResourceManager::GetGLuint("skybox-texture-cubemap"));
         glDrawArrays(GL_TRIANGLES, 0, 36);
-        glDepthMask(true);
+        glDepthFunc(GL_LESS);
     }
 
     static void LoadResources() {

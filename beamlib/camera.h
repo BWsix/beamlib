@@ -43,7 +43,10 @@ public:
     }
     Transform *getTargetTranform() const { return &targetInstance->transform; }
 
+    void setPitch(float pitch) { this->pitch = pitch; }
+    void setYaw(float yaw) { this->yaw = yaw; }
     void setMovementSpeed(float speed) { movementSpeed = speed; }
+    void setRadius(float r) { radius = r; }
     glm::vec3 getFront() const { return glm::vec3(cos(glm::radians(yaw)) * cos(glm::radians(pitch)), sin(glm::radians(pitch)), sin(glm::radians(yaw)) * cos(glm::radians(pitch))); }
     glm::mat4 getViewMatrix() const {
         if (isFirstPersonMode()) {

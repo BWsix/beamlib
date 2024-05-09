@@ -1,3 +1,4 @@
+#include "utils.h"
 #include "mesh.h"
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures, Lighting lighting) {
@@ -36,8 +37,10 @@ void Mesh::setupMesh() {
 }
 
 void Mesh::draw(Blib::ShaderProgram &shader) const {
-    // shader.setUniformVec3("lighting.ambient", lighting.ambientColor);
-    shader.SetVec3("lighting.diffuse", lighting.diffuseColor);
+    shader.SetVec3("lighting.ambient", lighting.ambient);
+    shader.SetVec3("lighting.diffuse", lighting.diffuse);
+    shader.SetVec3("lighting.specular", lighting.specular);
+    shader.SetFloat("lighting.shininess", lighting.shininess);
 
     size_t diffuseNumber = 1;
     size_t specularNumber = 1;

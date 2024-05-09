@@ -7,12 +7,12 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-smooth out vec3 WorldPos;
+smooth out vec3 FragPos;
 smooth out vec3 Normal;
 smooth out vec2 TexCoord;
 
 void main() {
-    WorldPos = vec3(model * vec4(aPosition, 1.0));
+    FragPos = vec3(model * vec4(aPosition, 1.0));
     Normal = mat3(transpose(inverse(model))) * aNormal;
     TexCoord = aTexCoord;
     gl_Position = projection * view * model * vec4(aPosition, 1.0);

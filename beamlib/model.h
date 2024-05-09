@@ -10,6 +10,7 @@ namespace Blib {
 
 GLuint loadTexture(const std::string &filename);
 GLuint loadCubeMap(const std::vector<std::string> &faces);
+GLuint loadCubeMap(const std::string &folder, const std::string& extention = ".png");
 
 class Model {
 public:

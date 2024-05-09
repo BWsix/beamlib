@@ -56,12 +56,19 @@ Mesh Blib::Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
     Lighting lighting;
-    aiColor3D diffuseColor(0.0f);
-    material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor); // Kd
-    lighting.diffuseColor = glm::vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
-    // aiColor3D ambientColor(0.0f);
-    // material->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor); // Ka
-    // lighting.ambientColor = glm::vec3(ambientColor.r, ambientColor.g, ambientColor.b);
+    aiColor3D diffuse(0.0f);
+    material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+    lighting.diffuse = glm::vec3(diffuse.r, diffuse.g, diffuse.b);
+
+    aiColor3D ambient(0.0f);
+    material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+    lighting.ambient = glm::vec3(ambient.r, ambient.g, ambient.b);
+
+    aiColor3D specular(0.0f);
+    material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+    lighting.specular = glm::vec3(specular.r, specular.g, specular.b);
+
+    material->Get(AI_MATKEY_SHININESS, lighting.shininess);
 
     return Mesh(vertices, indices, textures, lighting);
 }
@@ -164,4 +171,16 @@ GLuint Blib::loadCubeMap(const std::vector<std::string> &faces) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     return textureID;
+}
+
+GLuint Blib::loadCubeMap(const std::string &folder, const std::string& ext) {
+    std::vector<std::string> faces = {
+        folder + "/px" + ext,
+        folder + "/nx" + ext,
+        folder + "/py" + ext,
+        folder + "/ny" + ext,
+        folder + "/pz" + ext,
+        folder + "/nz" + ext,
+    };
+    return loadCubeMap(faces);
 }

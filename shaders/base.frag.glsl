@@ -9,6 +9,8 @@ in vec3 TexCoords3D;
 struct Lighting {
     vec3 ambient;
     vec3 diffuse;
+    vec3 specular;
+    float shininess;
 };
 
 struct Material {
