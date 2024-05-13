@@ -90,7 +90,7 @@ public:
         cameraAnimator.Update();
         cameraAnimator.disabled = true;
         glDisablei(GL_BLEND, 2); // buffer for motion vector
-        root.Render(prog, 3);
+        root.Render(prog);
 
         if (state == State::Gymbaring) {
             gymbar.render();

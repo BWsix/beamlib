@@ -29,8 +29,6 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    setup();
-
     Blib::Instance scene("DEFAULT SCENE");
     scene.PushChild(&Blib::camera);
 
@@ -48,10 +46,6 @@ int main() {
     lilypad.root.transform.Scale({1.0, 40.0, 40.0});
     lilypad.root.transform.RotateLocal({0.0, 0.0, 1.571});
     lilypad.root.transform.Translate({0.55, 0.1, 40});
-
-    Screen::LoadResources();
-    Screen::LoadOtherPostProcessingResources();
-    Screen screen;
 
     while (!Blib::WindowShouldClose(window)) {
         glfwPollEvents();
