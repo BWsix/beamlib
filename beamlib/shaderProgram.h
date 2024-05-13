@@ -9,8 +9,12 @@ namespace Blib {
 
 class ShaderProgram {
 public:
+    static ShaderProgram From(const char *vertexPath, const char *fragmentPath) {
+        return ShaderProgram().Compile(vertexPath, fragmentPath);
+    }
+
     unsigned int ID; 
-    void Compile(const char *vertexPath, const char *fragmentPath);
+    ShaderProgram Compile(const char *vertexPath, const char *fragmentPath);
     void Use() const { glUseProgram(ID); }
 
     void SetBool(const std::string &name, bool value) const { glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value); }

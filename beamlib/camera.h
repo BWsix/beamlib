@@ -58,6 +58,13 @@ public:
     }
     glm::mat4 getProjectionMatrix() const { return glm::perspective(glm::radians(fovy), aspect, near, far); }
 
+    glm::mat4 prev;
+    glm::mat4 getPrevViewProjectionMatrix() {
+        auto tmp = prev;
+        prev = getProjectionMatrix() * getViewMatrix();
+        return tmp;
+    }
+
     void Update() override;
 
     void CustomRenderUI() override {

@@ -8,7 +8,7 @@
 #include "utils.h"
 #include <fstream>
 #include <functional>
-#include <iostream>
+#include <beamlib.h>
 #include <iterator>
 
 namespace Blib {
@@ -76,6 +76,8 @@ struct FrameManager {
 
 class Animator {
 public:
+    bool disabled = false;
+
     std::string name;
     float timeElapsed = 0.0f;
 
@@ -229,6 +231,7 @@ public:
     }
 
     void LoadJson(const json& j) {
+        if (disabled) return;
         frames.clear();
         for (auto frame : j["frames"]) {
             frames.push_back({frame});
@@ -238,6 +241,7 @@ public:
     }
 
     void Update() {
+        if (disabled) return;
         if (!playing) return;
         if (timeElapsed >= frameManager.length) {
             if (looping) {
@@ -269,12 +273,14 @@ public:
     }
 
     void Play(std::function<void()> cb = [](){}) {
+        if (disabled) return;
         timeElapsed = 0.0f;
         playing = true;
         animationEndingCallback = cb;
     }
 
     void End() {
+        if (disabled) return;
         playing = false;
         animationEndingCallback();
     }

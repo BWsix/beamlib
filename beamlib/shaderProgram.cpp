@@ -26,7 +26,7 @@ void Blib::ShaderProgram::CheckProgramLinkStatus(GLuint program) {
     }
 }
 
-void Blib::ShaderProgram::Compile(const char* vertexPath, const char* fragmentPath) {
+Blib::ShaderProgram Blib::ShaderProgram::Compile(const char* vertexPath, const char* fragmentPath) {
     ID = glCreateProgram();
 
     GLuint vertexShader;
@@ -53,4 +53,6 @@ void Blib::ShaderProgram::Compile(const char* vertexPath, const char* fragmentPa
 
     free(vertexShaderSource);
     free(fragmentShaderSource);
+    
+    return *this;
 }

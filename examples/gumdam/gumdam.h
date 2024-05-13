@@ -18,7 +18,7 @@ public:
     }
 };
 
-class Gundam {
+class Gumdam {
     Blib::Instance body{"body", Blib::ResourceManager::GetModel("gumdam-body")};
         Blib::Instance head{"head", Blib::ResourceManager::GetModel("gumdam-head")};
         Blib::Instance back{"back", Blib::ResourceManager::GetModel("gumdam-back")};
@@ -37,6 +37,7 @@ class Gundam {
             Blib::Instance urightleg{"urightleg", Blib::ResourceManager::GetModel("gumdam-urightleg")};
                 Blib::Instance drightleg{"drightleg", Blib::ResourceManager::GetModel("gumdam-drightleg")};
                     Blib::Instance rightfoot{"rightfoot", Blib::ResourceManager::GetModel("gumdam-rightfoot")};
+
         LazerInstance lazer{"beam", Blib::ResourceManager::GetModel("gumdam-lazer")};
         LazerInstance fireball{"ball", Blib::ResourceManager::GetModel("gumdam-fireball")};
 
@@ -53,7 +54,7 @@ public:
 
     Blib::Animator cameraAnimator{"camera animator", &Blib::camera};
 
-    Gundam() {
+    Gumdam() {
         Blib::camera.setTargetInstance(&root);
         root.PushChild(&body);
 
@@ -83,10 +84,13 @@ public:
         prog.Use();
         prog.SetMat4("view", Blib::camera.getViewMatrix());
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
+        prog.SetMat4("prevViewProjection", Blib::camera.getPrevViewProjectionMatrix());
 
         gumdamAnimator.Update();
         cameraAnimator.Update();
-        root.Render(prog);
+        cameraAnimator.disabled = true;
+        glDisablei(GL_BLEND, 2); // buffer for motion vector
+        root.Render(prog, 3);
 
         if (state == State::Gymbaring) {
             gymbar.render();
@@ -194,6 +198,7 @@ public:
         gumdamAnimator.Play([&](){
             gumdamAnimator.looping = false;
             gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-idle"));
+            state = State::Idle;
         });
 
         cameraAnimator.looping = false;
@@ -204,7 +209,6 @@ public:
             cameraAnimator.Play([&](){
                 gumdamAnimator.looping = false;
                 cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle"));
-                state = State::Idle;
             });
         });
 

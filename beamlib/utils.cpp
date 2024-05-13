@@ -43,7 +43,7 @@ GLFWwindow *Blib::CreateWindow(const char *title, int width, int height) {
     window = glfwCreateWindow(width, height, title, NULL, NULL);
     assert(window && "Failed to create window ._.");
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
     // setup GLAD
     if (!gladLoadGL(glfwGetProcAddress)) {
@@ -141,11 +141,13 @@ glm::mat4 Blib::vectorToMat4(std::vector<float> data) {
 
 void Blib::useFrameBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Blib::useFrameBuffer(const std::string& id) {
-    GLuint& custom_framebuffer_object = ResourceManager::GetGLuint(id);
-    glBindFramebuffer(GL_FRAMEBUFFER, custom_framebuffer_object);
+    GLuint& fbo = ResourceManager::GetGLuint(id);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
