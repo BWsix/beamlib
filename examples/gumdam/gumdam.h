@@ -259,13 +259,13 @@ public:
 
         gumdamAnimator.looping = false;
         gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-puru-victory"));
-        gumdamAnimator.Play();
+        gumdamAnimator.Play([&](){
+            state = State::Idle;
+        });
 
         cameraAnimator.looping = false;
         cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle-to-puru-victory"));
-        cameraAnimator.Play([&](){
-            state = State::Idle;
-        });
+        cameraAnimator.Play();
     }
 
     void kamehaneha() {

@@ -10,6 +10,8 @@ Camera camera("CAMERA");
 }
 
 void Blib::Camera::Update() {
+    prevViewProj = getProjectionMatrix() * getViewMatrix();
+
     if (ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard) {
         return;
     }

@@ -53,8 +53,8 @@ public:
         glDepthFunc(GL_LEQUAL);
         auto prog = Blib::ResourceManager::GetShader("skybox");
         prog.Use();
-        glm::mat4 view = glm::mat4(glm::mat3(Blib::camera.getViewMatrix()));  
-        prog.SetMat4("view", view);
+        prog.SetMat4("model", glm::scale(glm::mat4(1), glm::vec3(256)));
+        prog.SetMat4("view", Blib::camera.getViewMatrix());
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
 
         glBindVertexArray(Blib::ResourceManager::GetGLuint("skybox-vao"));

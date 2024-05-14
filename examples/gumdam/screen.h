@@ -42,12 +42,19 @@ public:
 
         // blur
         prog.SetBool("blur", blur);
+        prog.SetMat4("prevViewProjection", Blib::camera.getPrevViewProjectionMatrix());
+        auto mat = Blib::camera.getProjectionMatrix() * Blib::camera.getViewMatrix();
+        prog.SetMat4("invViewProjection", glm::inverse(mat));
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         prog.SetInt("screenTex", 0);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture_motion);
         prog.SetInt("motion", 1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, texture_depth);
+        prog.SetInt("depth", 2);
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 6);

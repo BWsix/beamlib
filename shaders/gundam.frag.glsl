@@ -27,5 +27,5 @@ void main() {
 
     vec3 NDCPos = (ClipSpacePos / ClipSpacePos.w).xyz;
     vec3 PrevNDCPos = (PrevClipSpacePos / PrevClipSpacePos.w).xyz;
-    motion = vec4((NDCPos - PrevNDCPos).xy, -101, 0.0);
+    motion = vec4((NDCPos - PrevNDCPos).xy, 101, 1.0);
 }

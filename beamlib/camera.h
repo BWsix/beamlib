@@ -17,7 +17,7 @@ class Camera : public Instance {
     float fovy = 45;
     float aspect = (float)Blib::WIDTH / Blib::HEIGHT;
     float near = 0.1;
-    float far = 150;
+    float far = 500;
 
     float sensitivity = 0.05;
     float movementSpeed = 10;
@@ -58,11 +58,9 @@ public:
     }
     glm::mat4 getProjectionMatrix() const { return glm::perspective(glm::radians(fovy), aspect, near, far); }
 
-    glm::mat4 prev;
+    glm::mat4 prevViewProj;
     glm::mat4 getPrevViewProjectionMatrix() {
-        auto tmp = prev;
-        prev = getProjectionMatrix() * getViewMatrix();
-        return tmp;
+        return prevViewProj;
     }
 
     void Update() override;
