@@ -29,6 +29,14 @@ public:
     glm::vec3 getRotationEuler() const { return glm::eulerAngles(rotationQuat); }
     glm::vec3 getLocalRotationEuler() const { return glm::eulerAngles(localRotationQuat); }
     glm::quat getLocalRotationQuat() const { return localRotationQuat; }
+    glm::mat4 getModelMatrixNoScale() const {
+        glm::mat4 model(1);
+        glm::mat4 parentModel = parent ? parent->getModelMatrixForChildren() : glm::mat4(1);
+        return parentModel
+        * glm::toMat4(rotationQuat) 
+        * glm::translate(model, position)
+        * glm::toMat4(localRotationQuat);
+    }
     glm::mat4 getModelMatrix() const {
         glm::mat4 model(1);
         glm::mat4 parentModel = parent ? parent->getModelMatrixForChildren() : glm::mat4(1);

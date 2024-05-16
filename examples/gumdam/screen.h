@@ -1,7 +1,6 @@
 #pragma once
 
 #include <beamlib.h>
-#include "imgui.h"
 #include <cstdlib>
 #include <glad/gl.h>
 #include <iostream>
@@ -19,9 +18,11 @@ const float quadVertices[] = {
 
 class Screen {
     GLuint vao, vbo, fbo;
-    GLuint texture, texture_faceid, texture_depth, texture_motion;
+    GLuint texture, texture_bright_color, texture_depth, texture_motion;
 
-    GLuint *ids;
+    unsigned int pingpongFBO[2];
+    unsigned int pingpongBuffers[2];
+
 public:
     uint width, height;
 
@@ -29,7 +30,9 @@ public:
 
     bool pixelation = false;
     float pixelSize = 5.0;
-    bool blur = false;
+    float exposure = 1.0;
+    bool motionBlur = false;
+    // int blurness = 10;
     void render(Blib::ShaderProgram prog) {
         glDisable(GL_DEPTH_TEST);
         glViewport(0, 0, width, height < 1 ? 1 : height);
@@ -40,11 +43,15 @@ public:
         prog.SetVec2("screenSize", glm::vec2(width, height));
         prog.SetFloat("pixelSize", pixelSize);
 
-        // blur
-        prog.SetBool("blur", blur);
+        // motion blur
+        // prog.SetInt("blurness", blurness);
+        prog.SetBool("motionBlur", motionBlur);
         prog.SetMat4("prevViewProjection", Blib::camera.getPrevViewProjectionMatrix());
         auto mat = Blib::camera.getProjectionMatrix() * Blib::camera.getViewMatrix();
         prog.SetMat4("invViewProjection", glm::inverse(mat));
+
+        // HDR
+        prog.SetFloat("exposure", exposure);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -55,6 +62,9 @@ public:
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, texture_depth);
         prog.SetInt("depth", 2);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, pingpongBuffers[0]);
+        prog.SetInt("blur", 3);
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -70,53 +80,48 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void updateIds()  {
-        glBindTexture(GL_TEXTURE_2D, texture_faceid);
-        glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, ids);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-
-    uint getFaceId(ImVec2 pos) {
-        return ids[size_t((height - pos.y) * width + pos.x)];
-    }
-
     void resize(uint width, uint height) {
         this->width = width;
         this->height = height;
-        ids = (uint *)realloc(ids, sizeof(uint) * width * height);
+        Blib::setupBuffer(texture, width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        Blib::setupBuffer(texture_bright_color, width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT, 1);
+        Blib::setupBuffer(texture_motion, width, height, GL_RGB32F, GL_RGB, GL_FLOAT, 2);
 
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture, 0);
-
-        glBindTexture(GL_TEXTURE_2D, texture_faceid);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, texture_faceid, 0);
+        Blib::setupBuffer(pingpongBuffers[0], width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT, 0);
+        Blib::setupBuffer(pingpongBuffers[1], width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT, 0);
 
         glBindTexture(GL_TEXTURE_2D, texture_depth);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture_depth, 0);
+    }
 
-        glBindTexture(GL_TEXTURE_2D, texture_motion);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, texture_motion, 0);
+    void blur(Blib::ShaderProgram prog) {
+        bool horizontal = true;
+        bool first_iteration = true;
+        uint amount = 2 * 10;
+        prog.Use();
+
+        for (uint i = 0; i < amount; i++) {
+            glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]); 
+            prog.SetInt("horizontal", horizontal);
+            glBindTexture(GL_TEXTURE_2D, first_iteration ? texture_bright_color : pingpongBuffers[!horizontal]); 
+
+            glDisable(GL_DEPTH_TEST);
+            glBindVertexArray(vao);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glEnable(GL_DEPTH_TEST);
+
+            horizontal = !horizontal;
+            if (first_iteration) {
+                first_iteration = false;
+            }
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     void loadResources() {
-        ids = new GLuint[width * height];
-
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
@@ -133,29 +138,13 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
         glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture, 0);
+        Blib::setupBuffer(texture, width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-        glGenTextures(1, &texture_faceid);
-        glBindTexture(GL_TEXTURE_2D, texture_faceid);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, texture_faceid, 0);
+        glGenTextures(1, &texture_bright_color);
+        Blib::setupBuffer(texture_bright_color, width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT, 1);
 
         glGenTextures(1, &texture_motion);
-        glBindTexture(GL_TEXTURE_2D, texture_motion);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, texture_motion, 0);
+        Blib::setupBuffer(texture_motion, width, height, GL_RGB32F, GL_RGB, GL_FLOAT, 2);
 
         glGenTextures(1, &texture_depth);
         glBindTexture(GL_TEXTURE_2D, texture_depth);
@@ -171,6 +160,14 @@ public:
             std::cerr << "ERROR: Framebuffer is not complete\n";
             exit(1);
         }
+
+        glGenTextures(2, pingpongBuffers);
+        glGenFramebuffers(2, pingpongFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[0]);
+        Blib::setupBuffer(pingpongBuffers[0], width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[1]);
+        Blib::setupBuffer(pingpongBuffers[1], width, height, GL_RGBA16F, GL_RGBA, GL_FLOAT, 0);
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 };

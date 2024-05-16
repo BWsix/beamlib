@@ -64,7 +64,7 @@ public:
     }
 
     static void LoadResources() {
-        Blib::ResourceManager::LoadShader("skybox", "shaders/skybox.vert.glsl", "shaders/skybox.frag.glsl");
+        Blib::ResourceManager::LoadShader("skybox", "examples/envmap/shaders/skybox.vert.glsl", "shaders/skybox.frag.glsl");
         Blib::ResourceManager::GetGLuint("skybox-texture-cubemap") = Blib::loadCubeMap("textures/parkinglot");
 
         GLuint& vao = Blib::ResourceManager::GetGLuint("skybox-vao");

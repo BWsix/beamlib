@@ -53,7 +53,7 @@ public:
         glDepthFunc(GL_LEQUAL);
         auto prog = Blib::ResourceManager::GetShader("skybox");
         prog.Use();
-        prog.SetMat4("model", glm::scale(glm::mat4(1), glm::vec3(256)));
+        prog.SetMat4("model", glm::scale(glm::mat4(1), glm::vec3(400)));
         prog.SetMat4("view", Blib::camera.getViewMatrix());
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
 

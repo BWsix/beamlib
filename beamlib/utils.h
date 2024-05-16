@@ -54,4 +54,6 @@ public:
 inline const char* label(std::string& s) { return s.c_str(); }
 inline const char* label(std::string&& s) { return s.c_str(); }
 
+void setupBuffer(GLuint id, int width, int height, int internal, int format, int type, int attachment);
+
 } // namespace beamlib

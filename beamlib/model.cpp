@@ -102,20 +102,25 @@ GLuint Blib::loadTexture(const std::string &filename) {
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
+    GLenum internalFormat = GL_SRGB;
     GLenum format = GL_RGB;
     stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
 
     if (data) {
-        if (nrComponents == 1)
+        if (nrComponents == 1) {
+            internalFormat = GL_RED;
             format = GL_RED;
-        else if (nrComponents == 3)
+        } else if (nrComponents == 3) {
+            internalFormat = GL_SRGB;
             format = GL_RGB;
-        else if (nrComponents == 4)
+        } else if (nrComponents == 4) {
+            internalFormat = GL_SRGB_ALPHA;
             format = GL_RGBA;
+        }
 
         glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -138,6 +143,7 @@ GLuint Blib::loadCubeMap(const std::vector<std::string> &faces) {
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
     int width, height, nrComponents;
+    GLenum internalFormat = GL_RGB;
     GLenum format = GL_RGB;
     stbi_set_flip_vertically_on_load(false);
 
@@ -146,16 +152,19 @@ GLuint Blib::loadCubeMap(const std::vector<std::string> &faces) {
 
         unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
         if (data) {
-            if (nrComponents == 1)
+            if (nrComponents == 1) {
+                internalFormat = GL_RED;
                 format = GL_RED;
-            else if (nrComponents == 3)
+            } else if (nrComponents == 3) {
+                internalFormat = GL_SRGB;
                 format = GL_RGB;
-            else if (nrComponents == 4)
+            } else if (nrComponents == 4) {
+                internalFormat = GL_SRGB_ALPHA;
                 format = GL_RGBA;
+            }
 
             glBindTexture(GL_TEXTURE_2D, textureID);
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
             stbi_image_free(data);
         } else {

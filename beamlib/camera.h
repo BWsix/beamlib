@@ -17,7 +17,7 @@ class Camera : public Instance {
     float fovy = 45;
     float aspect = (float)Blib::WIDTH / Blib::HEIGHT;
     float near = 0.1;
-    float far = 500;
+    float far = 800;
 
     float sensitivity = 0.05;
     float movementSpeed = 10;
@@ -54,6 +54,13 @@ public:
         } else {
             // TODO: this might not be the correct way of getting position, but it works so... yeah
             return glm::lookAt(getTargetTranform()->getPosition() - radius * getFront(), getTargetTranform()->getPosition(), {0, 1, 0});
+        }
+    }
+    glm::vec3 getPosition() {
+        if (isFirstPersonMode()) {
+            return transform.getLocalPosition();
+        } else {
+            return getTargetTranform()->getPosition() - radius * getFront();
         }
     }
     glm::mat4 getProjectionMatrix() const { return glm::perspective(glm::radians(fovy), aspect, near, far); }

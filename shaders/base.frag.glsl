@@ -25,3 +25,6 @@ struct Material {
 uniform Material material;
 uniform Lighting lighting;
 uniform samplerCube skybox;
+
+uniform vec3 lightPos;
+uniform vec3 viewPos;

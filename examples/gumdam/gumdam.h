@@ -3,6 +3,7 @@
 #include "gymbar.h"
 #include <string>
 #include <beamlib.h>
+#include "particles.h"
 
 class LazerInstance : public Blib::Instance {
 public:
@@ -79,18 +80,26 @@ public:
         body.PushChild(&fireball);
     }
 
+    bool particle_on = false;
+    Particles kame_particle = Particles(500);
     void render() {
         auto prog = Blib::ResourceManager::GetShader("gumdam");
         prog.Use();
+        prog.SetVec3("viewPos", Blib::camera.getPosition());
+        prog.SetVec3("lightPos", Blib::camera.getPosition());
         prog.SetMat4("view", Blib::camera.getViewMatrix());
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
         prog.SetMat4("prevViewProjection", Blib::camera.getPrevViewProjectionMatrix());
 
         gumdamAnimator.Update();
         cameraAnimator.Update();
-        cameraAnimator.disabled = true;
-        glDisablei(GL_BLEND, 2); // buffer for motion vector
         root.Render(prog);
+
+        if (particle_on) {
+            glm::mat4 m = lazer.transform.getModelMatrixNoScale();
+            kame_particle.update(m);
+            kame_particle.render(Blib::ResourceManager::GetShader("gumdam-particles"));
+        }
 
         if (state == State::Gymbaring) {
             gymbar.render();
@@ -142,6 +151,8 @@ public:
 
         cameraAnimator.looping = false;
         cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle"));
+
+        kame_particle.loadResources();
     }
 
     std::function<void()> end;
@@ -272,9 +283,15 @@ public:
         state = State::Kemehanehaing;
 
         gumdamAnimator.looping = false;
-        gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-kamehaneha"));
-        gumdamAnimator.Play([&](){
-            state = State::Idle;
+        gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-kamehaneha-1"));
+        gumdamAnimator.Play([&]() {
+            particle_on = true;
+            kame_particle.startTimer();
+            gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-kamehaneha-2"));
+            gumdamAnimator.Play([&]() {
+                particle_on = false;
+                state = State::Idle;
+            });
         });
 
         cameraAnimator.looping = false;
@@ -285,6 +302,7 @@ public:
     static void LoadResources() {
         Blib::ResourceManager::LoadShader("gumdam", "shaders/gundam.vert.glsl", "shaders/gundam.frag.glsl");
         Blib::ResourceManager::LoadShader("gumdam-lazer", "shaders/lazer.vert.glsl", "shaders/lazer.frag.glsl");
+        Blib::ResourceManager::LoadShader("gumdam-particles", "shaders/particles.vert.glsl", "shaders/particles.frag.glsl");
 
         Blib::ResourceManager::LoadAnimation("gumdam-idle", "animations/gumdam-idle.json");
         Blib::ResourceManager::LoadAnimation("camera-idle", "animations/camera-idle.json");
@@ -312,7 +330,8 @@ public:
         Blib::ResourceManager::LoadAnimation("gumdam-puru-victory", "animations/gumdam-puru-victory.json");
         Blib::ResourceManager::LoadAnimation("camera-idle-to-puru-victory", "animations/camera-idle-to-puru-victory.json");
 
-        Blib::ResourceManager::LoadAnimation("gumdam-kamehaneha", "animations/gumdam-kamehaneha.json");
+        Blib::ResourceManager::LoadAnimation("gumdam-kamehaneha-1", "animations/gumdam-kamehaneha-1.json");
+        Blib::ResourceManager::LoadAnimation("gumdam-kamehaneha-2", "animations/gumdam-kamehaneha-2.json");
         Blib::ResourceManager::LoadAnimation("camera-idle-to-kamehaneha", "animations/camera-idle-to-kamehaneha.json");
 
         Blib::ResourceManager::LoadModel("gumdam-back", "models/gundam/back.obj");
@@ -334,7 +353,7 @@ public:
         Blib::ResourceManager::LoadModel("gumdam-urighthand", "models/gundam/urighthand.obj");
         Blib::ResourceManager::LoadModel("gumdam-urightleg", "models/gundam/urightleg.obj");
 
-        Blib::ResourceManager::LoadModel("gumdam-lazer", "models/lazer/lazer.obj");
+        Blib::ResourceManager::LoadModel("gumdam-lazer", "models/misc/cylinder.obj");
         Blib::ResourceManager::LoadModel("gumdam-fireball", "models/fireball/fireball.obj");
     }
 };

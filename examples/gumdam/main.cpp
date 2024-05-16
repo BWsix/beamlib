@@ -9,10 +9,12 @@ struct {
 } conf;
 
 int main() {
-    const auto window = Blib::CreateWindow("gundam", Blib::WIDTH, Blib::HEIGHT);
+    const auto window = Blib::CreateWindow("gumdam", Blib::WIDTH, Blib::HEIGHT);
 
     Blib::ShaderProgram screenProgram;
     screenProgram.Compile("shaders/screen.vert.glsl", "shaders/screen.frag.glsl");
+    Blib::ShaderProgram gaussianBlurProgram;
+    gaussianBlurProgram.Compile("shaders/screen.vert.glsl", "shaders/gaussianBlur.frag.glsl");
     static Screen screen(Blib::WIDTH, Blib::HEIGHT);
     screen.loadResources();
 
@@ -26,8 +28,8 @@ int main() {
 
     glClearColor(0, 0, 0, 1);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_POINT_SPRITE);
+    glEnable(GL_PROGRAM_POINT_SIZE);
 
     Blib::Instance scene("DEFAULT SCENE");
     scene.PushChild(&Blib::camera);
@@ -56,8 +58,11 @@ int main() {
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        skybox.render();
         gumdam.render();
+        screen.blur(gaussianBlurProgram);
+
+        screen.bind();
+        skybox.render();
         lilypad.render();
 
         screen.unbind();
@@ -92,10 +97,21 @@ int main() {
 
             ImGui::Begin("Effects", NULL, ImGuiWindowFlags_AlwaysAutoResize);
             {
-                ImGui::Checkbox("Blur", &screen.blur);
-                ImGui::Checkbox("Pixlation", &screen.pixelation);
+                // Camera
+                ImGui::Checkbox("Disable Camera Animator", &gumdam.cameraAnimator.disabled);
+
+                // Motion Blur
+                ImGui::Checkbox("Motion Blur", &screen.motionBlur);
+                // ImGui::SameLine();
+                // ImGui::SliderInt("Blurness", &screen.blurness, 1, 100);
+
+                // Pixelation
+                ImGui::Checkbox("Pixelation", &screen.pixelation);
                 ImGui::SameLine();
                 ImGui::SliderFloat("Size", &screen.pixelSize, 1, 40);
+
+                // HDR
+                ImGui::SliderFloat("Exposure", &screen.exposure, 0.01, 10);
             }
             ImGui::End();
         }
