@@ -82,22 +82,25 @@ public:
 
     bool particle_on = false;
     Particles kame_particle = Particles(500);
-    void render() {
-        auto prog = Blib::ResourceManager::GetShader("gumdam");
-        prog.Use();
-        prog.SetVec3("viewPos", Blib::camera.getPosition());
-        prog.SetVec3("lightPos", Blib::camera.getPosition());
-        prog.SetMat4("view", Blib::camera.getViewMatrix());
-        prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
-        prog.SetMat4("prevViewProjection", Blib::camera.getPrevViewProjectionMatrix());
 
+    void update() {
         gumdamAnimator.Update();
         cameraAnimator.Update();
-        root.Render(prog);
-
         if (particle_on) {
             glm::mat4 m = lazer.transform.getModelMatrixNoScale();
             kame_particle.update(m);
+        }
+    }
+
+    void render(Blib::ShaderProgram prog, glm::vec3 lightPos) {
+        prog.SetVec3("viewPos", Blib::camera.getPosition());
+        prog.SetVec3("lightPos", lightPos);
+        prog.SetMat4("view", Blib::camera.getViewMatrix());
+        prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
+        prog.SetMat4("prevViewProjection", Blib::camera.getPrevViewProjectionMatrix());
+        root.Render(prog);
+
+        if (particle_on) {
             kame_particle.render(Blib::ResourceManager::GetShader("gumdam-particles"));
         }
 

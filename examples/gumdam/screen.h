@@ -71,8 +71,8 @@ public:
         glEnable(GL_DEPTH_TEST);
     }
 
-
     void bind() {
+        glViewport(0, 0, width, height);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     }
 

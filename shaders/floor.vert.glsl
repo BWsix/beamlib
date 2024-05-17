@@ -14,7 +14,4 @@ void main() {
     LightSpacePosition = lightVP * model * vec4(aPosition, 1.0);
     Normal = mat3(transpose(inverse(model))) * aNormal;
     TexCoords = aTexCoords;
-
-    ClipSpacePos = mvp * vec4(aPosition, 1.0);
-    PrevClipSpacePos = prevViewProjection * prevModel * vec4(aPosition, 1.0);
-}
+} 

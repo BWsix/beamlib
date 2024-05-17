@@ -3,6 +3,8 @@
 layout(location=0) out vec4 color;
 layout(location=2) out vec4 motion;
 
+uniform sampler2D depthTex;
+
 in vec4 ClipSpacePos;
 in vec4 PrevClipSpacePos;
 
@@ -26,7 +28,9 @@ void main() {
     vec3 specular = spec * specularIntensity * lighting.diffuse;
     // vec3 specular = specularIntensity * vec3(texture(material.texture_specular1, TexCoords));
 
-    vec3 result = ambient + diffuse + specular;
+    float shadow = ShadowCalculation(depthTex, LightSpacePosition);
+    vec3 result = ambient + (1.0 - shadow) * (diffuse + specular);
+
     float gamma = 2.2;
     color = vec4(pow(result, vec3(gamma)), 1.0);
 
