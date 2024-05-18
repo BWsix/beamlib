@@ -17,13 +17,13 @@ public:
     ShaderProgram Compile(const char *vertexPath, const char *fragmentPath);
     void Use() const { glUseProgram(ID); }
 
-    void SetBool(const std::string &name, bool value) const { glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value); }
-    void SetInt(const std::string &name, int value) const { glUniform1i(glGetUniformLocation(ID, name.c_str()), value); }
-    void SetFloat(const std::string &name, float value) const { glUniform1f(glGetUniformLocation(ID, name.c_str()), value); }
-    void SetVec2(const std::string &name, const glm::vec2 &value) const { glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value)); }
-    void SetVec3(const std::string &name, const glm::vec3 &value) const { glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value)); }
-    void SetVec4(const std::string &name, const glm::vec4 &value) const { glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value)); }
-    void SetMat4(const std::string &name, const glm::mat4 &mat) const { glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat)); }
+    ShaderProgram& SetBool(const std::string &name, bool value) { return glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value), *this; }
+    ShaderProgram& SetInt(const std::string &name, int value) { return glUniform1i(glGetUniformLocation(ID, name.c_str()), value), *this; }
+    ShaderProgram& SetFloat(const std::string &name, float value) { return glUniform1f(glGetUniformLocation(ID, name.c_str()), value), *this; }
+    ShaderProgram& SetVec2(const std::string &name, const glm::vec2 &value) { return glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value)), *this; }
+    ShaderProgram& SetVec3(const std::string &name, const glm::vec3 &value) { return glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value)), *this; }
+    ShaderProgram& SetVec4(const std::string &name, const glm::vec4 &value) { return glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value)), *this; }
+    ShaderProgram& SetMat4(const std::string &name, const glm::mat4 &mat) { return glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat)), *this; }
 
 private:
     void CheckShaderCompileStatus(unsigned int shader);

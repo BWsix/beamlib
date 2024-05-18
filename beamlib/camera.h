@@ -72,6 +72,12 @@ public:
 
     void Update() override;
 
+    void toggleReflect() {
+        auto p = transform.getPosition();
+        transform.Translate(glm::vec3(0, -2.0 * p.y, 0));
+        pitch = -pitch;
+    }
+
     void CustomRenderUI() override {
         ImGui::DragFloat(("pitch##" + name).c_str(), &pitch, 0.1);
         ImGui::DragFloat(("yaw##" + name).c_str(), &yaw, 0.1);
