@@ -1,9 +1,6 @@
 # glad
 add_subdirectory(glad)
 
-# OpenMesh
-add_subdirectory(OpenMesh)
-
 # glfw
 add_subdirectory(glfw)
 
