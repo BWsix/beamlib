@@ -24,9 +24,9 @@ class Screen {
     unsigned int pingpongBuffers[2];
 
 public:
-    uint width, height;
+    GLuint width, height;
 
-    Screen(uint width, uint height): width(width), height(height){}
+    Screen(GLuint width, GLuint height): width(width), height(height){}
 
     bool pixelation = false;
     float pixelSize = 5.0;
@@ -80,7 +80,7 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void resize(uint width, uint height) {
+    void resize(GLuint width, GLuint height) {
         this->width = width;
         this->height = height;
         Blib::setupBuffer(texture, width, height, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, 0);
@@ -100,7 +100,7 @@ public:
     void blur(Blib::ShaderProgram prog) {
         bool horizontal = true;
         bool first_iteration = true;
-        uint amount = 2 * 10;
+        GLuint amount = 2 * 10;
         prog.Use();
 
         for (uint i = 0; i < amount; i++) {

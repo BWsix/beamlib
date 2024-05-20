@@ -27,9 +27,9 @@ class Screen {
 
     GLuint texture_depth;
 public:
-    uint width, height;
+    GLuint width, height;
 
-    Screen(uint width, uint height): width(width), height(height){}
+    Screen(GLuint width, GLuint height): width(width), height(height){}
 
     void render(Blib::ShaderProgram prog) {
         glDisable(GL_DEPTH_TEST);
@@ -66,7 +66,7 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    void resize(uint width, uint height) {
+    void resize(GLuint width, GLuint height) {
         this->width = width;
         this->height = height;
         Blib::setupBuffer(texture_refraction, width, height, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, 0);
