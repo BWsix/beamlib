@@ -108,7 +108,7 @@ int main() {
             prog.Use();
             prog.SetMat4("lightVP", depthmap.getLightProjection() * depthmap.getLightView(lightPos));
             prog.SetInt("depthTex", 10);
-            gumdam.render(prog, lightPos);
+            gumdam.render(prog, lightPos, true);
 
             screen.blur(gaussianBlurProgram);
 

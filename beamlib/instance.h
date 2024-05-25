@@ -67,8 +67,6 @@ public:
     glm::mat4 prevModel;
     virtual void CustomRender(ShaderProgram prog) {
         prog.Use();
-        prog.SetMat4("prevModel", prevModel);
-        prevModel = transform.getModelMatrix();
         prog.SetMat4("model", prevModel);
         model.draw(prog);
     }
@@ -78,6 +76,16 @@ public:
     }
     virtual void CustomRenderUI() {}
     virtual void RenderUI() {
+
+    virtual void RenderWithPrevModel(ShaderProgram prog) {
+        prog.Use();
+        prog.SetMat4("prevModel", prevModel);
+        prevModel = transform.getModelMatrix();
+        prog.SetMat4("model", prevModel);
+        model.draw(prog);
+        for (auto child : children) child->RenderWithPrevModel(prog);
+    }
+
         if (ImGui::TreeNode(name.c_str())) {
             transform.RenderUI(name);
             CustomRenderUI();

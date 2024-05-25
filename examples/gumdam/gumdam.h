@@ -92,13 +92,17 @@ public:
         }
     }
 
-    void render(Blib::ShaderProgram prog, glm::vec3 lightPos) {
+    void render(Blib::ShaderProgram prog, glm::vec3 lightPos, bool withPrevModel = false) {
         prog.SetVec3("viewPos", Blib::camera.getPosition());
         prog.SetVec3("lightPos", lightPos);
         prog.SetMat4("view", Blib::camera.getViewMatrix());
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
         prog.SetMat4("prevViewProjection", Blib::camera.getPrevViewProjectionMatrix());
-        root.Render(prog);
+        if (withPrevModel) {
+            root.RenderWithPrevModel(prog);
+        } else {
+            root.Render(prog);
+        }
 
         if (particle_on) {
             kame_particle.render(Blib::ResourceManager::GetShader("gumdam-particles"));
