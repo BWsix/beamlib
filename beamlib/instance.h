@@ -65,25 +65,25 @@ public:
     }
 
     glm::mat4 prevModel;
-    virtual void CustomRender(ShaderProgram prog) {
-        prog.Use();
-        prog.SetMat4("model", prevModel);
-        model.draw(prog);
-    }
-    virtual void Render(ShaderProgram prog) {
-        CustomRender(prog);
-        for (auto child : children) child->Render(prog);
-    }
-    virtual void CustomRenderUI() {}
-    virtual void RenderUI() {
-
-    virtual void RenderWithPrevModel(ShaderProgram prog) {
+    virtual void CustomRenderWithPrevModel(ShaderProgram prog) {
         prog.Use();
         prog.SetMat4("prevModel", prevModel);
         prevModel = transform.getModelMatrix();
         prog.SetMat4("model", prevModel);
         model.draw(prog);
-        for (auto child : children) child->RenderWithPrevModel(prog);
+    }
+    virtual void CustomRender(ShaderProgram prog) {
+        prog.Use();
+        prog.SetMat4("model", transform.getModelMatrix());
+        model.draw(prog);
+    }
+    virtual void Render(ShaderProgram prog, bool with_prev_model = false) {
+        if (with_prev_model) {
+            CustomRenderWithPrevModel(prog);
+        } else {
+            CustomRender(prog);
+        }
+        for (auto child : children) child->Render(prog, with_prev_model);
     }
 
         if (ImGui::TreeNode(name.c_str())) {

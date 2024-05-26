@@ -17,6 +17,10 @@ public:
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
         model.draw(prog);
     }
+
+    void CustomRenderWithPrevModel(Blib::ShaderProgram prog) override {
+        CustomRender(prog);
+    }
 };
 
 class Gumdam {
@@ -92,17 +96,14 @@ public:
         }
     }
 
-    void render(Blib::ShaderProgram prog, glm::vec3 lightPos, bool withPrevModel = false) {
+    void render(Blib::ShaderProgram prog, glm::vec3 lightPos, bool with_prev_model = false) {
         prog.SetVec3("viewPos", Blib::camera.getPosition());
         prog.SetVec3("lightPos", lightPos);
         prog.SetMat4("view", Blib::camera.getViewMatrix());
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
         prog.SetMat4("prevViewProjection", Blib::camera.getPrevViewProjectionMatrix());
-        if (withPrevModel) {
-            root.RenderWithPrevModel(prog);
-        } else {
-            root.Render(prog);
-        }
+        root.Render(prog, with_prev_model);
+
 
         if (particle_on) {
             kame_particle.render(Blib::ResourceManager::GetShader("gumdam-particles"));
