@@ -36,9 +36,9 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_POINT_SPRITE);
     glEnable(GL_PROGRAM_POINT_SIZE);
-    // glEnable(GL_CULL_FACE);
-    // glCullFace(GL_BACK);
-    // glFrontFace(GL_CCW);  
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);  
 
     Blib::Instance scene("DEFAULT SCENE");
     scene.PushChild(&Blib::camera);
@@ -109,6 +109,14 @@ int main() {
             prog.SetMat4("lightVP", depthmap.getLightProjection() * depthmap.getLightView(lightPos));
             prog.SetInt("depthTex", 10);
             gumdam.render(prog, lightPos, true);
+
+            if (gumdam.particle_on) {
+                gumdam.kame_particle.render(Blib::ResourceManager::GetShader("gumdam-particles"));
+            }
+
+            if (gumdam.explosion_on) {
+                gumdam.explosion.render(Blib::ResourceManager::GetShader("gumdam-explosion"), glm::mat4(1));
+            }
 
             screen.blur(gaussianBlurProgram);
 

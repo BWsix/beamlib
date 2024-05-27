@@ -4,6 +4,8 @@
 #include <string>
 #include <beamlib.h>
 #include "particles.h"
+#include "explosion.h"
+#include "fire.h"
 
 class LazerInstance : public Blib::Instance {
 public:
@@ -23,8 +25,37 @@ public:
     }
 };
 
+class FireballInstance : public Blib::Instance {
+public:
+    using Blib::Instance::Instance;
+    Particles explotion_particle = Particles(500);
+
+    void CustomRender(Blib::ShaderProgram prog) override {
+        prog = Blib::ResourceManager::GetShader("gumdam-explosion");
+        prog.Use();
+        prog.SetFloat("time", Blib::getTimeElapsed());
+        prog.SetMat4("model", transform.getModelMatrix());
+        prog.SetMat4("view", Blib::camera.getViewMatrix());
+        prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
+    }
+
+    void CustomRenderWithPrevModel(Blib::ShaderProgram prog) override {
+        CustomRender(prog);
+    }
+};
+
+class GumdamInstance : public Blib::Instance {
+public:
+    using Blib::Instance::Instance;
+
+    void renderFire() override {
+        fire.render(transform.getModelMatrix());
+        for (auto child : children) child->renderFire();
+    }
+};
+
 class Gumdam {
-    Blib::Instance body{"body", Blib::ResourceManager::GetModel("gumdam-body")};
+    GumdamInstance body{"body", Blib::ResourceManager::GetModel("gumdam-body")};
         Blib::Instance head{"head", Blib::ResourceManager::GetModel("gumdam-head")};
         Blib::Instance back{"back", Blib::ResourceManager::GetModel("gumdam-back")};
         Blib::Instance lshouder{"lshouder", Blib::ResourceManager::GetModel("gumdam-lshouder")};
@@ -44,7 +75,7 @@ class Gumdam {
                     Blib::Instance rightfoot{"rightfoot", Blib::ResourceManager::GetModel("gumdam-rightfoot")};
 
         LazerInstance lazer{"beam", Blib::ResourceManager::GetModel("gumdam-lazer")};
-        LazerInstance fireball{"ball", Blib::ResourceManager::GetModel("gumdam-fireball")};
+        FireballInstance fireball{"ball", Blib::ResourceManager::GetModel("gumdam-fireball")};
 
     Gymbar gymbar;
 
@@ -87,12 +118,20 @@ public:
     bool particle_on = false;
     Particles kame_particle = Particles(500);
 
+    bool explosion_on = false;
+    Explosion explosion = Explosion(20);
+
     void update() {
         gumdamAnimator.Update();
         cameraAnimator.Update();
+
         if (particle_on) {
             glm::mat4 m = lazer.transform.getModelMatrixNoScale();
             kame_particle.update(m);
+        }
+
+        if (explosion_on) {
+            explosion.update(glm::mat4(1), Blib::camera.getPosition());
         }
     }
 
@@ -103,11 +142,6 @@ public:
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
         prog.SetMat4("prevViewProjection", Blib::camera.getPrevViewProjectionMatrix());
         root.Render(prog, with_prev_model);
-
-
-        if (particle_on) {
-            kame_particle.render(Blib::ResourceManager::GetShader("gumdam-particles"));
-        }
 
         if (state == State::Gymbaring) {
             gymbar.render();
@@ -161,6 +195,7 @@ public:
         cameraAnimator.LoadJson(Blib::ResourceManager::GetAnimation("camera-idle"));
 
         kame_particle.loadResources();
+        explosion.loadResources();
     }
 
     std::function<void()> end;
@@ -276,9 +311,14 @@ public:
     void puru_victory() {
         state = State::PuruVictorying;
 
+        explosion_on = true;
+        explosion.startTimer();
+
         gumdamAnimator.looping = false;
         gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-puru-victory"));
         gumdamAnimator.Play([&](){
+            explosion_on = false;
+
             state = State::Idle;
         });
 
@@ -295,9 +335,11 @@ public:
         gumdamAnimator.Play([&]() {
             particle_on = true;
             kame_particle.startTimer();
+
             gumdamAnimator.LoadJson(Blib::ResourceManager::GetAnimation("gumdam-kamehaneha-2"));
             gumdamAnimator.Play([&]() {
                 particle_on = false;
+
                 state = State::Idle;
             });
         });
@@ -311,6 +353,8 @@ public:
         Blib::ResourceManager::LoadShader("gumdam", "shaders/gundam.vert.glsl", "shaders/gundam.frag.glsl");
         Blib::ResourceManager::LoadShader("gumdam-lazer", "shaders/lazer.vert.glsl", "shaders/lazer.frag.glsl");
         Blib::ResourceManager::LoadShader("gumdam-particles", "shaders/particles.vert.glsl", "shaders/particles.frag.glsl");
+        Blib::ResourceManager::LoadShader("gumdam-explosion", "shaders/explosion.vert.glsl", "shaders/explosion.frag.glsl");
+        Blib::ResourceManager::LoadShader("gumdam-fire", "shaders/fire.vert.glsl", "shaders/fire.frag.glsl");
 
         Blib::ResourceManager::LoadAnimation("gumdam-idle", "animations/gumdam-idle.json");
         Blib::ResourceManager::LoadAnimation("camera-idle", "animations/camera-idle.json");
@@ -363,5 +407,7 @@ public:
 
         Blib::ResourceManager::LoadModel("gumdam-lazer", "models/misc/cylinder.obj");
         Blib::ResourceManager::LoadModel("gumdam-fireball", "models/fireball/fireball.obj");
+
+        Blib::ResourceManager::LoadTexture("rgba-noise", "textures/rgba-noise-medium.png", true);
     }
 };

@@ -6,11 +6,10 @@
 #include <glm/gtc/random.hpp>
 #include <vector>
 
-const float radius = 7.0;
-const int max_size = 10;
-const float duration = 1.0;
-
 struct Point {
+    const float radius = 7.0;
+    const int max_size = 10;
+    const float duration = 1.0;
 
     glm::vec3 initialPos;
     float progress = -420;
