@@ -86,6 +86,9 @@ public:
         for (auto child : children) child->Render(prog, with_prev_model);
     }
 
+
+    virtual void CustomRenderUI() {}
+    virtual void RenderUI() {
         if (ImGui::TreeNode(name.c_str())) {
             transform.RenderUI(name);
             CustomRenderUI();
