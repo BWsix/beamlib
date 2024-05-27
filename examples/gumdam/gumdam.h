@@ -5,7 +5,6 @@
 #include <beamlib.h>
 #include "particles.h"
 #include "explosion.h"
-#include "fire.h"
 
 class LazerInstance : public Blib::Instance {
 public:
@@ -44,18 +43,8 @@ public:
     }
 };
 
-class GumdamInstance : public Blib::Instance {
-public:
-    using Blib::Instance::Instance;
-
-    void renderFire() override {
-        fire.render(transform.getModelMatrix());
-        for (auto child : children) child->renderFire();
-    }
-};
-
 class Gumdam {
-    GumdamInstance body{"body", Blib::ResourceManager::GetModel("gumdam-body")};
+    Blib::Instance body{"body", Blib::ResourceManager::GetModel("gumdam-body")};
         Blib::Instance head{"head", Blib::ResourceManager::GetModel("gumdam-head")};
         Blib::Instance back{"back", Blib::ResourceManager::GetModel("gumdam-back")};
         Blib::Instance lshouder{"lshouder", Blib::ResourceManager::GetModel("gumdam-lshouder")};
@@ -354,7 +343,6 @@ public:
         Blib::ResourceManager::LoadShader("gumdam-lazer", "shaders/lazer.vert.glsl", "shaders/lazer.frag.glsl");
         Blib::ResourceManager::LoadShader("gumdam-particles", "shaders/particles.vert.glsl", "shaders/particles.frag.glsl");
         Blib::ResourceManager::LoadShader("gumdam-explosion", "shaders/explosion.vert.glsl", "shaders/explosion.frag.glsl");
-        Blib::ResourceManager::LoadShader("gumdam-fire", "shaders/fire.vert.glsl", "shaders/fire.frag.glsl");
 
         Blib::ResourceManager::LoadAnimation("gumdam-idle", "animations/gumdam-idle.json");
         Blib::ResourceManager::LoadAnimation("camera-idle", "animations/camera-idle.json");
