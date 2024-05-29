@@ -4,14 +4,12 @@ A barely working graphics library built for an introdoctory computer graphics co
 
 ### Quick start
 
-Project 1 is located in `examples/gumdam/`, and can be built with the following commands:
-
 ```bash
-git clone --recursive https://github.com/BWsix/beamlib
+git clone --recursive https://github.com/BWsix/beamlib.git
 cd beamlib
-cmake -DASSIMP_WARNINGS_AS_ERRORS=OFF -S . -B build
+cmake -S . -B build
 cmake --build build -j
 
 # for project 1, execute `build/examples/gumdam/gumdam` from the root directory
+# for project 2, execute `build/examples/hub` from the root directory
 ```
-
