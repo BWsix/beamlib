@@ -112,7 +112,7 @@ public:
         GLuint amount = 2 * 10;
         prog.Use();
 
-        for (uint i = 0; i < amount; i++) {
+        for (size_t i = 0; i < amount; i++) {
             glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]); 
             prog.SetInt("horizontal", horizontal);
             glBindTexture(GL_TEXTURE_2D, first_iteration ? texture_bright_color : pingpongBuffers[!horizontal]); 
