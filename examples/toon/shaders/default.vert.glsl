@@ -7,9 +7,9 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-smooth out vec3 FragPos;
-smooth out vec3 Normal;
-smooth out vec2 TexCoord;
+out vec3 FragPos;
+out vec3 Normal;
+out vec2 TexCoord;
 
 void main() {
     FragPos = vec3(model * vec4(aPosition, 1.0));

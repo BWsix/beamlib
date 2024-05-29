@@ -1,8 +1,8 @@
 #version 430 core
 
-smooth in vec3 FragPos;
-smooth in vec3 Normal;
-smooth in vec2 TexCoord;
+in vec3 FragPos;
+in vec3 Normal;
+in vec2 TexCoord;
 
 uniform vec3 lightPos;
 uniform vec3 lightColor;
