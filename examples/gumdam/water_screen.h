@@ -5,8 +5,6 @@
 #include <glad/gl.h>
 #include <iostream>
 
-namespace WaterDemo {
-
 const float waterQuadVertices[] = {
     // positions   // texCoords
     -1.0f,  1.0f,  0.0f, 1.0f,
@@ -18,8 +16,7 @@ const float waterQuadVertices[] = {
     1.0f,  1.0f,  1.0f, 1.0f
 };
 
-
-class Screen {
+class WaterScreen {
     GLuint vao, vbo;
 
     GLuint fbo_reflection;
@@ -31,14 +28,14 @@ class Screen {
 public:
     GLuint width, height;
 
-    Screen(GLuint width, GLuint height): width(width), height(height){}
+    WaterScreen(GLuint width, GLuint height): width(width), height(height){}
 
     void render(Blib::ShaderProgram prog) {
         glDisable(GL_DEPTH_TEST);
 
-        glActiveTexture(GL_TEXTURE10);
+        glActiveTexture(GL_TEXTURE15);
         glBindTexture(GL_TEXTURE_2D, texture_reflection);
-        prog.SetInt("screenTex", 10);
+        prog.SetInt("screenTex", 15);
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -127,5 +124,3 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 };
-
-}

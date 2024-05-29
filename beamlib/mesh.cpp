@@ -67,3 +67,35 @@ void Mesh::draw(Blib::ShaderProgram &shader) const {
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 } 
+
+void Mesh::drawInstanced(Blib::ShaderProgram &shader, int count) const {
+    shader.SetVec3("lighting.ambient", lighting.ambient);
+    shader.SetVec3("lighting.diffuse", lighting.diffuse);
+    shader.SetVec3("lighting.specular", lighting.specular);
+    shader.SetFloat("lighting.shininess", lighting.shininess);
+
+    size_t diffuseNumber = 1;
+    size_t specularNumber = 1;
+    for(size_t i = 0; i < textures.size(); i++) {
+        // activate proper texture unit before binding
+        glActiveTexture(GL_TEXTURE0 + i);
+
+        // retrieve texture number (the N in diffuse_textureN)
+        std::string number;
+        std::string name = textures[i].type;
+        if(name == "texture_diffuse") {
+            number = std::to_string(diffuseNumber++);
+        } else if(name == "texture_specular") {
+            number = std::to_string(specularNumber++);
+        }
+
+        shader.SetInt("material." + name + number, i);
+        glBindTexture(GL_TEXTURE_2D, textures[i].id);
+    }
+    glActiveTexture(GL_TEXTURE0);
+
+    // draw mesh
+    glBindVertexArray(VAO);
+    glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, count);
+    glBindVertexArray(0);
+} 

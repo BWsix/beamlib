@@ -10,11 +10,11 @@ public:
     //     prog.SetMat4("view", Blib::camera.getViewMatrix());
     //     prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
     //
-    //     auto obj = Blib::ResourceManager::GetModel("cybertruck");
+    //     auto obj = Blib::ResourceManager::GetModel("envmapdemo-cybertruck");
     //     obj.draw(prog);
     // }
 
     static void LoadResources() {
-        Blib::ResourceManager::LoadModel("cybertruck", "models/cybertruck/cybertruck.obj");
+        Blib::ResourceManager::LoadModel("envmapdemo-cybertruck", "models/cybertruck/cybertruck.obj");
     }
 };

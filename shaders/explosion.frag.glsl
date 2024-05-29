@@ -38,13 +38,13 @@ void main() {
 
     vec3 coord = vec3(atan(p.x,p.y)/6.2832+.5, length(p)*.4, .5);
 
-    for(int i = 1; i <= 7; i++) {
+    for(int i = 1; i <= 4; i++) {
         float power = pow(2.0, float(i));
         color += (1.5 / power) * snoise(coord + vec3(0.,-iTime*.1, iTime*.02), power*16.);
     }
 
     vec3 finalColor = vec3(color, pow(max(color,0.),2.)*0.4, pow(max(color,0.),3.)*0.15);
-    if (length(vec3(finalColor)) < 1.1 || length(gl_PointCoord * 2 - 1) > 1.25) {
+    if (length(vec3(finalColor)) < 1.25 || length(gl_PointCoord * 2 - 1) > 1.25) {
         discard;
     }
     FragColor = vec4(finalColor, length(finalColor) * length(gl_PointCoord * 2 - 1) * 0.2);

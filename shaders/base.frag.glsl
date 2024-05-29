@@ -46,6 +46,10 @@ float ShadowCalculation(sampler2D shadowMap, vec4 fragPosLightSpace) {
     float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
     // float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
 
+    if(projCoords.z > 1.0) {
+        shadow = 0.0;
+    }
+
     return shadow;
 }  
 

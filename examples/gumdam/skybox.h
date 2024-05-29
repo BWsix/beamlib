@@ -65,14 +65,15 @@ public:
 
     static void LoadResources() {
         Blib::ResourceManager::LoadShader("skybox", "shaders/skybox.vert.glsl", "shaders/skybox.frag.glsl");
-        Blib::ResourceManager::GetGLuint("skybox-texture-cubemap") = Blib::loadCubeMap({
-            "textures/skybox/right.jpg",
-            "textures/skybox/left.jpg",
-            "textures/skybox/top.jpg",
-            "textures/skybox/bottom.jpg",
-            "textures/skybox/front.jpg",
-            "textures/skybox/back.jpg",
-        });
+        Blib::ResourceManager::GetGLuint("skybox-texture-cubemap") = Blib::loadCubeMap("textures/sky");
+        // Blib::ResourceManager::GetGLuint("skybox-texture-cubemap") = Blib::loadCubeMap({
+        //     "textures/skybox/right.jpg",
+        //     "textures/skybox/left.jpg",
+        //     "textures/skybox/top.jpg",
+        //     "textures/skybox/bottom.jpg",
+        //     "textures/skybox/front.jpg",
+        //     "textures/skybox/back.jpg",
+        // });
 
         GLuint& vao = Blib::ResourceManager::GetGLuint("skybox-vao");
         GLuint& vbo = Blib::ResourceManager::GetGLuint("skybox-vbo");

@@ -1,4 +1,5 @@
 #include "base.frag.glsl"
+#include "toon.glsl"
 
 layout(location=0) out vec4 color;
 layout(location=2) out vec4 motion;
@@ -8,7 +9,14 @@ uniform sampler2D depthTex;
 in vec4 ClipSpacePos;
 in vec4 PrevClipSpacePos;
 
+uniform bool reflectionMode;
+uniform bool toon;
+
 void main() {
+    if (reflectionMode && Position.y < 0){
+        discard;
+    }
+
     vec3 lightDir = normalize(lightPos - Position);
     vec3 normal = normalize(Normal);
     vec3 reflectDir = reflect(-lightDir, normal);
@@ -33,6 +41,10 @@ void main() {
 
     float gamma = 2.2;
     color = vec4(pow(result, vec3(gamma)), 1.0);
+    if (toon) {
+        float intensity = max(dot(normal, lightDir), 0.0);
+        color = vec4(tooner(color.rgb, intensity), 1.0);
+    }
 
     vec3 NDCPos = (ClipSpacePos / ClipSpacePos.w).xyz;
     vec3 PrevNDCPos = (PrevClipSpacePos / PrevClipSpacePos.w).xyz;

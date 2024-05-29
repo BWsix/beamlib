@@ -65,25 +65,25 @@ public:
     }
 
     glm::mat4 prevModel;
-    virtual void CustomRenderWithPrevModel(ShaderProgram prog) {
+    virtual void CustomRenderWithPrevModel(ShaderProgram prog, int count = 1) {
         prog.Use();
         prog.SetMat4("prevModel", prevModel);
         prevModel = transform.getModelMatrix();
         prog.SetMat4("model", prevModel);
-        model.draw(prog);
+        model.drawInstanced(prog, count);
     }
-    virtual void CustomRender(ShaderProgram prog) {
+    virtual void CustomRender(ShaderProgram prog, int count = 1) {
         prog.Use();
         prog.SetMat4("model", transform.getModelMatrix());
-        model.draw(prog);
+        model.drawInstanced(prog, count);
     }
-    virtual void Render(ShaderProgram prog, bool with_prev_model = false) {
+    virtual void Render(ShaderProgram prog, bool with_prev_model = false, int count = 1) {
         if (with_prev_model) {
-            CustomRenderWithPrevModel(prog);
+            CustomRenderWithPrevModel(prog, count);
         } else {
-            CustomRender(prog);
+            CustomRender(prog, count);
         }
-        for (auto child : children) child->Render(prog, with_prev_model);
+        for (auto child : children) child->Render(prog, with_prev_model, count);
     }
 
 

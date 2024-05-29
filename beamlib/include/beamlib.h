@@ -11,3 +11,4 @@
 #include "../texture.h"
 #include "../transform.h"
 #include "../utils.h"
+#include "../scene.h"
