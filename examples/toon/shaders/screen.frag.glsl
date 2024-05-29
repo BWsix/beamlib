@@ -12,15 +12,15 @@ void make_kernel(inout vec4 n[9], sampler2D tex, vec2 coord, float weight) {
 	float w = weight / sz.x;
 	float h = weight / sz.y;
 
-	n[0] = texture2D(tex, coord + vec2( -w, -h));
-	n[1] = texture2D(tex, coord + vec2(0.0, -h));
-	n[2] = texture2D(tex, coord + vec2(  w, -h));
-	n[3] = texture2D(tex, coord + vec2( -w, 0.0));
-	n[4] = texture2D(tex, coord);
-	n[5] = texture2D(tex, coord + vec2(  w, 0.0));
-	n[6] = texture2D(tex, coord + vec2( -w, h));
-	n[7] = texture2D(tex, coord + vec2(0.0, h));
-	n[8] = texture2D(tex, coord + vec2(  w, h));
+	n[0] = texture(tex, coord + vec2( -w, -h));
+	n[1] = texture(tex, coord + vec2(0.0, -h));
+	n[2] = texture(tex, coord + vec2(  w, -h));
+	n[3] = texture(tex, coord + vec2( -w, 0.0));
+	n[4] = texture(tex, coord);
+	n[5] = texture(tex, coord + vec2(  w, 0.0));
+	n[6] = texture(tex, coord + vec2( -w, h));
+	n[7] = texture(tex, coord + vec2(0.0, h));
+	n[8] = texture(tex, coord + vec2(  w, h));
 }
 
 vec4 sobel(inout vec4 n[9]) {
@@ -37,7 +37,7 @@ void main() {
     if (length(sobel(n).rgb) > threshold) {
         FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     } else {
-        FragColor = texture2D(screenTex, TexCoord);
+        FragColor = texture(screenTex, TexCoord);
     }
 
     // sharpen

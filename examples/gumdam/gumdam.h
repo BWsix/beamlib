@@ -10,7 +10,7 @@ class LazerInstance : public Blib::Instance {
 public:
     using Blib::Instance::Instance;
 
-    void CustomRender(Blib::ShaderProgram prog) override {
+    void CustomRender(Blib::ShaderProgram prog, int count) override {
         prog = Blib::ResourceManager::GetShader("gumdam-lazer");
         prog.Use();
         prog.SetMat4("model", transform.getModelMatrix());
@@ -19,8 +19,8 @@ public:
         model.draw(prog);
     }
 
-    void CustomRenderWithPrevModel(Blib::ShaderProgram prog) override {
-        CustomRender(prog);
+    void CustomRenderWithPrevModel(Blib::ShaderProgram prog, int count) override {
+        CustomRender(prog, count);
     }
 };
 
@@ -29,7 +29,7 @@ public:
     using Blib::Instance::Instance;
     Particles explotion_particle = Particles(500);
 
-    void CustomRender(Blib::ShaderProgram prog) override {
+    void CustomRender(Blib::ShaderProgram prog, int count) override {
         prog = Blib::ResourceManager::GetShader("gumdam-explosion");
         prog.Use();
         prog.SetFloat("time", Blib::getTimeElapsed());
@@ -38,8 +38,8 @@ public:
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
     }
 
-    void CustomRenderWithPrevModel(Blib::ShaderProgram prog) override {
-        CustomRender(prog);
+    void CustomRenderWithPrevModel(Blib::ShaderProgram prog, int count) override {
+        CustomRender(prog, count);
     }
 };
 
@@ -79,30 +79,6 @@ public:
 
     Blib::Animator cameraAnimator{"camera animator", &Blib::camera};
 
-    Gumdam() {
-        Blib::camera.setTargetInstance(&root);
-        root.PushChild(&body);
-
-        body.PushChild(&head);
-        body.PushChild(&back);
-        body.PushChild(&lshouder);
-            lshouder.PushChild(&ulefthand);
-                ulefthand.PushChild(&dlefthand);
-                    dlefthand.PushChild(&lefthand);
-        body.PushChild(&rshouder);
-            rshouder.PushChild(&urighthand);
-                urighthand.PushChild(&drighthand);
-                    drighthand.PushChild(&righthand);
-        body.PushChild(&dbody);
-            dbody.PushChild(&urightleg);
-                urightleg.PushChild(&drightleg);
-                    drightleg.PushChild(&rightfoot);
-            dbody.PushChild(&uleftleg);
-                uleftleg.PushChild(&dleftleg);
-                    dleftleg.PushChild(&leftfoot);
-        body.PushChild(&lazer);
-        body.PushChild(&fireball);
-    }
 
     bool particle_on = false;
     Particles kame_particle = Particles(500);
@@ -124,13 +100,14 @@ public:
         }
     }
 
+    int count = 1;
     void render(Blib::ShaderProgram prog, glm::vec3 lightPos, bool with_prev_model = false) {
         prog.SetVec3("viewPos", Blib::camera.getPosition());
         prog.SetVec3("lightPos", lightPos);
         prog.SetMat4("view", Blib::camera.getViewMatrix());
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
         prog.SetMat4("prevViewProjection", Blib::camera.getPrevViewProjectionMatrix());
-        root.Render(prog, with_prev_model);
+        root.Render(prog, with_prev_model, count);
 
         if (state == State::Gymbaring) {
             gymbar.render();
@@ -174,7 +151,35 @@ public:
         ImGui::End();
     }
 
+    void setup() {
+        Blib::camera.setTargetInstance(&root);
+        Blib::camera.resetPitch();
+        Blib::camera.resetYaw();
+    }
+
     void init() {
+        root.PushChild(&body);
+
+        body.PushChild(&head);
+        body.PushChild(&back);
+        body.PushChild(&lshouder);
+            lshouder.PushChild(&ulefthand);
+                ulefthand.PushChild(&dlefthand);
+                    dlefthand.PushChild(&lefthand);
+        body.PushChild(&rshouder);
+            rshouder.PushChild(&urighthand);
+                urighthand.PushChild(&drighthand);
+                    drighthand.PushChild(&righthand);
+        body.PushChild(&dbody);
+            dbody.PushChild(&urightleg);
+                urightleg.PushChild(&drightleg);
+                    drightleg.PushChild(&rightfoot);
+            dbody.PushChild(&uleftleg);
+                uleftleg.PushChild(&dleftleg);
+                    dleftleg.PushChild(&leftfoot);
+        body.PushChild(&lazer);
+        body.PushChild(&fireball);
+
         state = State::Idle;
 
         gumdamAnimator.looping = false;

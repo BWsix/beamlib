@@ -6,8 +6,8 @@
 class Depthmap {
     GLuint fbo;
 
-    int width = 5000;
-    int height = 5000;
+    int width = 7500;
+    int height = 7500;
 
 public:
     GLuint texture_depth;
@@ -34,8 +34,8 @@ public:
 
     glm::mat4 getLightProjection() {
         float near = 1;
-        float far = 90;
-        glm::mat4 lightProjection = glm::ortho(-90.0f, 90.0f, -90.0f, 90.0f, near, far);
+        float far = 100;
+        glm::mat4 lightProjection = glm::ortho(-150.0f, 150.0f, -150.0f, 150.0f, near, far);
         return lightProjection;
     }
 

@@ -6,6 +6,7 @@
 namespace Blib {
 
 class Transform {
+public:
     Transform *parent = NULL;
     glm::vec3 position = {0, 0, 0};
     glm::vec3 localPosition = {0, 0, 0};
@@ -14,7 +15,6 @@ class Transform {
     glm::vec3 scale = {1, 1, 1};
     glm::vec3 localScale = {1, 1, 1};
 
-public:
     void setParent(Transform *transform) { parent = transform; }
     void Translate(glm::vec3 offset) { position += offset; }
     void TranslateLocal(glm::vec3 offset) { localPosition += offset; }
@@ -51,7 +51,8 @@ public:
         return parentModel
         * glm::toMat4(rotationQuat) 
         * glm::translate(glm::mat4(1), position)
-        * glm::toMat4(localRotationQuat);
+        * glm::toMat4(localRotationQuat)
+        * glm::scale(glm::mat4(1), scale);
     }
 
     void RenderUI(std::string name);

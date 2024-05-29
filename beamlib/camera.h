@@ -44,15 +44,26 @@ public:
     Transform *getTargetTranform() const { return &targetInstance->transform; }
 
     void setPitch(float pitch) { this->pitch = pitch; }
+    void resetPitch() { pitch = 0.0f; }
     void setYaw(float yaw) { this->yaw = yaw; }
+    void resetYaw() { yaw = -90.0f; }
     void setMovementSpeed(float speed) { movementSpeed = speed; }
     void setRadius(float r) { radius = r; }
     glm::vec3 getFront() const { return glm::vec3(cos(glm::radians(yaw)) * cos(glm::radians(pitch)), sin(glm::radians(pitch)), sin(glm::radians(yaw)) * cos(glm::radians(pitch))); }
-    glm::mat4 getViewMatrix() const {
+    glm::mat4 getViewMatrix() {
         if (isFirstPersonMode()) {
             return glm::lookAt(transform.getLocalPosition(), transform.getLocalPosition() + getFront(), {0, 1, 0});
         } else {
-            // TODO: this might not be the correct way of getting position, but it works so... yeah
+            if (reflectMode) {
+                pitch = -pitch;
+                auto eye = getTargetTranform()->getPosition() - radius * getFront();
+                eye.y *= -1;
+                auto center = getTargetTranform()->getPosition();
+                center.y *= -1;
+                auto m = glm::lookAt(eye, center, {0, 1, 0});
+                pitch = -pitch;
+                return m;
+            }
             return glm::lookAt(getTargetTranform()->getPosition() - radius * getFront(), getTargetTranform()->getPosition(), {0, 1, 0});
         }
     }
@@ -72,9 +83,14 @@ public:
 
     void Update() override;
 
+    bool reflectMode = false;
     void toggleReflect() {
-        auto p = transform.getPosition();
-        transform.Translate(glm::vec3(0, -2.0 * p.y, 0));
+        reflectMode = !reflectMode;
+        auto p = getPosition();
+        if (isFirstPersonMode()) {
+            transform.position.y *= -1;
+        } else {
+        }
         pitch = -pitch;
     }
 

@@ -28,8 +28,13 @@ public:
 
     Screen(GLuint width, GLuint height): width(width), height(height){}
 
+    //configs 
+    bool toon = false;
+    float toonThreshold = 0.7;
+
     bool pixelation = false;
     float pixelSize = 5.0;
+
     float exposure = 1.0;
     bool motionBlur = false;
     // int blurness = 10;
@@ -52,6 +57,10 @@ public:
 
         // HDR
         prog.SetFloat("exposure", exposure);
+
+        // toon shading
+        prog.SetBool("toon", toon);
+        prog.SetFloat("toonThreshold", toonThreshold);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -119,6 +128,25 @@ public:
             }
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void renderUI() {
+        ImGui::SeparatorText("Motion Blur");
+        ImGui::Checkbox("Motion Blur", &motionBlur);
+        // ImGui::SameLine();
+        // ImGui::SliderInt("Blurness", &screen.blurness, 1, 100);
+
+        ImGui::SeparatorText("Pixelation");
+        ImGui::Checkbox("Pixelation", &pixelation);
+        ImGui::SameLine();
+        ImGui::SliderFloat("Size", &pixelSize, 1, 40);
+
+        ImGui::SeparatorText("HDR");
+        ImGui::SliderFloat("Exposure", &exposure, 0.01, 10);
+
+        ImGui::SeparatorText("Toon");
+        ImGui::Checkbox("Toon", &toon);
+        ImGui::DragFloat("toonThreshold", &toonThreshold, 0.01, 0, 1);
     }
 
     void loadResources() {

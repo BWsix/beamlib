@@ -32,6 +32,7 @@ public:
 
     Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures, Lighting lighting);
     void draw(Blib::ShaderProgram &shader) const;
+    void drawInstanced(Blib::ShaderProgram &shader, int count) const;
 
 private:
     GLuint VAO;

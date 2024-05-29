@@ -20,6 +20,11 @@ public:
             mesh.draw(shader);
         }
     }
+    void drawInstanced(Blib::ShaderProgram &shader, int count) const {
+        for (const auto &mesh : meshes) {
+            mesh.drawInstanced(shader, count);
+        }
+    }
 
 private:
     // model data

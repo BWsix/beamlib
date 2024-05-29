@@ -19,8 +19,8 @@
 using json = nlohmann::json;
 
 namespace Blib {
-    int WIDTH = 1920;
-    int HEIGHT = 1080;
+    int WIDTH = 1280;
+    int HEIGHT = 720;
 }
 
 GLFWwindow *Blib::CreateWindow(const char *title, int width, int height) {
