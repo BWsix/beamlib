@@ -8,6 +8,7 @@
 #include "skybox.h"
 #include "water.h"
 #include "water_screen.h"
+#include "grid.h"
 
 struct Scene : Blib::Scene {
     struct {
@@ -22,6 +23,7 @@ struct Scene : Blib::Scene {
     Water water;
     Ball lightball;
     WaterScreen water_screen = WaterScreen(Blib::WIDTH, Blib::HEIGHT);
+    Grid grid;
 
     Blib::ShaderProgram screenProgram;
     Blib::ShaderProgram gaussianBlurProgram;
@@ -35,10 +37,15 @@ struct Scene : Blib::Scene {
         glEnable(GL_CULL_FACE);
 
         gumdam.setup();
+        Blib::camera.setPitch(17.784);
+        Blib::camera.setYaw(-65.852);
     }
 
     void init() override {
-        gumdam.root.transform.Translate({0.0, 21.2, 0.0});
+        gumdam.root.transform.Translate({0.0, 14.2, 0.0});
+        grid.transform.Translate({0.0, 14.2 - 21.2, 0.0});
+        grid.transform.Scale({1.5, 1.0, 1.5});
+
         water.transform.Scale({15, 1, 15});
         water.transform.Translate({0, -1, 0});
         lightball.transform.Translate({-15, 50, 15});
@@ -63,6 +70,7 @@ struct Scene : Blib::Scene {
         Water::LoadResources();
         Skybox::LoadResources();
         Ball::LoadResources();
+        Grid::LoadResources();
     }
 
     void render() override {
@@ -91,6 +99,12 @@ struct Scene : Blib::Scene {
             prog = Blib::ResourceManager::GetShader("water");
             prog.SetMat4("vp", depthmap.getLightProjection() * depthmap.getLightView(lightPos));
             water.render(lightPos);
+
+            prog = Blib::ResourceManager::GetShader("floor");
+            prog.Use();
+            prog.SetMat4("lightVP", depthmap.getLightProjection() * depthmap.getLightView(lightPos));
+            prog.SetInt("depthTex", 10);
+            grid.renderFloor(prog);
         }
 
         {
@@ -105,6 +119,7 @@ struct Scene : Blib::Scene {
             prog.SetInt("depthTex", 10);
             prog.SetBool("reflectionMode", true);
             gumdam.render(prog, lightPos);
+            prog = Blib::ResourceManager::GetShader("gumdam");
             prog.SetBool("reflectionMode", false);
 
             skybox.render();
@@ -117,13 +132,17 @@ struct Scene : Blib::Scene {
             glClearColor(0.0, 0.0, 0.0, 1);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            lightball.render(glm::vec3(1));
-
             auto prog = Blib::ResourceManager::GetShader("gumdam");
             prog.SetBool("toon", screen.toon);
             prog.SetMat4("lightVP", depthmap.getLightProjection() * depthmap.getLightView(lightPos));
             prog.SetInt("depthTex", 10);
             gumdam.render(prog, lightPos);
+
+            prog = Blib::ResourceManager::GetShader("floor");
+            prog.Use();
+            prog.SetMat4("lightVP", depthmap.getLightProjection() * depthmap.getLightView(lightPos));
+            prog.SetInt("depthTex", 10);
+            grid.renderFloor(prog);
 
             skybox.render();
         }
@@ -156,11 +175,11 @@ struct Scene : Blib::Scene {
             skybox.render();
             lightball.render(conf.lightColor);
 
-            // prog = Blib::ResourceManager::GetShader("floor");
-            // prog.Use();
-            // prog.SetMat4("lightVP", depthmap.getLightProjection() * depthmap.getLightView(lightPos));
-            // prog.SetInt("depthTex", 10);
-            // grid.renderFloor(prog);
+            prog = Blib::ResourceManager::GetShader("floor");
+            prog.Use();
+            prog.SetMat4("lightVP", depthmap.getLightProjection() * depthmap.getLightView(lightPos));
+            prog.SetInt("depthTex", 10);
+            grid.renderFloor(prog);
 
             prog = Blib::ResourceManager::GetShader("water");
             prog.SetMat4("lightVP", depthmap.getLightProjection() * depthmap.getLightView(lightPos));

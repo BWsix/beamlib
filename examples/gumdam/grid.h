@@ -23,9 +23,9 @@ const float planeVertices[] = {
 class Grid {
     int width;
     int instanceNumber;
-    Blib::Transform transform;
 
 public:
+    Blib::Transform transform;
     Grid(int width = 20) : width(width), instanceNumber(std::pow(width * 2 + 1, 2)) {}
 
     void render() {
@@ -41,9 +41,9 @@ public:
     }
 
     void renderFloor(Blib::ShaderProgram prog) {
+        prog.SetMat4("model", transform.getModelMatrix());
         prog.SetMat4("view", Blib::camera.getViewMatrix());
         prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
-        prog.SetMat4("model", transform.getModelMatrix());
         
         GLuint planeVAO = Blib::ResourceManager::GetGLuint("floor-vao");
         glBindVertexArray(planeVAO);

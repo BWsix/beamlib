@@ -15,34 +15,15 @@ const float water_vertices[] = {
     -water_width, -0.0f, -water_width,
 };
 
-struct Wave {
-    float length = 1.0;
-    float amplitude = 1.0;
-    float speed = 1.0;
-    float angle = 0.0;
-
-    glm::vec2 direction() {
-        return glm::vec2(glm::cos(angle), glm::sin(angle));
-    }
-
-    Wave() {
-        length = glm::linearRand(1.0, 10.0);
-        amplitude = glm::linearRand(0.1, 0.5);
-        speed = glm::linearRand(1.0, 10.0);
-        angle = glm::linearRand(0.0, 30.0);
-    }
-};
-
 class Water {
     int width;
     int instanceNumber;
 
-    std::vector<Wave> waves;
     int iterations = 18;
 
 public:
     Blib::Transform transform;
-    Water(int width = 300) : width(width), instanceNumber(std::pow(width * 2 + 1, 2)), waves(std::vector<Wave>(10)) {}
+    Water(int width = 200) : width(width), instanceNumber(std::pow(width * 2 + 1, 2)) {}
 
     bool mesh = false;
 

@@ -9,18 +9,15 @@
 struct FireBall {
     float time_elapsed = -420;
 
-    int max_size;
-    float max_radius;
-    glm::vec3 direction;
+    int max_size = 0;
+    float max_radius = 2;
+    glm::vec3 direction = glm::vec3(1);
 
-    FireBall() {
-        max_radius = 2;
-        max_size = glm::linearRand(1000, 1200);
+    void init(int from = 1000, int to = 1200, float max_radius = 2){
+        this->max_radius = max_radius;
+        max_size = glm::linearRand(from, to);
         direction = glm::sphericalRand(max_radius);
         direction.y = glm::abs(direction.y) * 1.2;
-    }
-
-    void init(){
         time_elapsed = 0.0;
     }
 
@@ -50,8 +47,7 @@ struct FireBall {
 };
 
 struct Explosion {
-    const float end_time = 6.5;
-    const int max_new_points_per_frame = 1;
+    int max_new_points_per_frame = 1;
 
     int n;
     GLuint vao, vbo;
@@ -60,8 +56,10 @@ struct Explosion {
     int idx = 0;
 
     float startTime = 0.0;
+    float end_time = 6.5;
 
     Explosion(int n): n(n), fires(std::vector<FireBall>(n)){}
+    Explosion(int n, float startTime, float end_time): n(n), fires(std::vector<FireBall>(n)), startTime(startTime), end_time(end_time) {}
 
     void startTimer(){
         startTime = Blib::getTimeElapsed();
@@ -70,6 +68,21 @@ struct Explosion {
     bool keepAnimating() {
         float now = Blib::getTimeElapsed();
         return now - startTime < end_time;
+    }
+
+    void renderFireBall(Blib::ShaderProgram prog, glm::mat4 model) {
+        glEnablei(GL_BLEND, 0);
+        glBlendFunci(0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        prog.Use();
+        prog.SetFloat("time", Blib::getTimeElapsed());
+        prog.SetMat4("model", glm::mat4(1));
+        prog.SetMat4("view", Blib::camera.getViewMatrix());
+        prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
+        glBindVertexArray(vao);
+        glDrawArrays(GL_POINTS, 0, n);
+
+        glDisablei(GL_BLEND, 0);
     }
 
     void render(Blib::ShaderProgram prog, glm::mat4 model) {
@@ -89,6 +102,28 @@ struct Explosion {
         glDrawArrays(GL_POINTS, 0, n);
 
         glDisablei(GL_BLEND, 0);
+    }
+
+    void updateFireball(glm::mat4 model, glm::vec3 cameraPos) {
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glm::vec4* g_points = (glm::vec4 *)glMapBufferRange(GL_ARRAY_BUFFER, 0, n * sizeof(glm::vec4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+        int points_added = 0;
+        for (int i = 0; i < n; i++) {
+            if (points_added < max_new_points_per_frame && fires[i].dead()) {
+                fires[i].init(150, 200, 0.2);
+                points_added += 1;
+            }
+            fires[i].update();
+            g_points[i] = glm::vec4(fires[i].getWorldPos(model), fires[i].size());
+        }
+
+        // std::sort(g_points, g_points + n, [cameraPos](const glm::vec4& a, const glm::vec4& b){
+        //     return glm::distance(glm::vec3(a), cameraPos) > glm::distance(glm::vec3(b), cameraPos);
+        // });
+
+        glUnmapBuffer(GL_ARRAY_BUFFER);
     }
 
     void update(glm::mat4 model, glm::vec3 cameraPos) {

@@ -27,15 +27,14 @@ public:
 class FireballInstance : public Blib::Instance {
 public:
     using Blib::Instance::Instance;
-    Particles explotion_particle = Particles(500);
+    Explosion explosion = Explosion(10, 5.0, 6.0);
+
+    void CustomUpdate() override {
+        explosion.updateFireball(transform.getModelMatrix(), Blib::camera.getPosition());
+    }
 
     void CustomRender(Blib::ShaderProgram prog, int count) override {
-        prog = Blib::ResourceManager::GetShader("gumdam-explosion");
-        prog.Use();
-        prog.SetFloat("time", Blib::getTimeElapsed());
-        prog.SetMat4("model", transform.getModelMatrix());
-        prog.SetMat4("view", Blib::camera.getViewMatrix());
-        prog.SetMat4("projection", Blib::camera.getProjectionMatrix());
+        explosion.renderFireBall(Blib::ResourceManager::GetShader("gumdam-explosion"), transform.getModelMatrix());
     }
 
     void CustomRenderWithPrevModel(Blib::ShaderProgram prog, int count) override {
@@ -97,7 +96,9 @@ public:
 
         if (explosion_on) {
             explosion.update(glm::mat4(1), Blib::camera.getPosition());
+            fireball.Update();
         }
+
     }
 
     int count = 1;
@@ -190,6 +191,7 @@ public:
 
         kame_particle.loadResources();
         explosion.loadResources();
+        fireball.explosion.loadResources();
     }
 
     std::function<void()> end;
