@@ -60,14 +60,17 @@ int main() {
             active_scene = &gumdamScene;
             active_scene->setup();
         }
+        ImGui::SameLine();
         if (ImGui::Button("Toon")) {
             active_scene = &toonScene;
             active_scene->setup();
         }
+        ImGui::SameLine();
         if (ImGui::Button("Water")) {
             active_scene = &waterScene;
             active_scene->setup();
         }
+        ImGui::SameLine();
         if (ImGui::Button("Env Map")) {
             active_scene = &envMapScene;
             active_scene->setup();

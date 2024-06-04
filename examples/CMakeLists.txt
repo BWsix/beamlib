@@ -9,6 +9,6 @@ add_executable(hub
 target_link_libraries(hub PRIVATE glad glfw glm imgui nlohmann_json assimp stb beamlib)
 
 if(UNIX)
-target_compile_options(hub PRIVATE "-Wall" "-Wextra" "-ggdb")
+target_compile_options(hub PRIVATE "-Wall" "-Wextra" "-ggdb" "-O5")
 endif()
 
