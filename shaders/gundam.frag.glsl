@@ -43,7 +43,16 @@ void main() {
     color = vec4(pow(result, vec3(gamma)), 1.0);
     if (toon) {
         float intensity = max(dot(normal, lightDir), 0.0);
-        color = vec4(tooner(color.rgb, intensity), 1.0);
+
+        if (intensity > 0.95) {
+            color.rgb = lighting.diffuse * vec3(1.0);
+        } else if (intensity > 0.7){ 
+            color.rgb = lighting.diffuse * vec3(0.9);
+        } else if (intensity > 0.5) {
+            color.rgb = lighting.diffuse * vec3(0.6);
+        } else {
+            color.rgb = lighting.diffuse * vec3(0.3);
+        }
     }
 
     vec3 NDCPos = (ClipSpacePos / ClipSpacePos.w).xyz;

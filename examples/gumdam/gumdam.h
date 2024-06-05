@@ -27,7 +27,7 @@ public:
 class FireballInstance : public Blib::Instance {
 public:
     using Blib::Instance::Instance;
-    Explosion explosion = Explosion(10, 5.0, 6.0);
+    Explosion explosion = Explosion(10, 5.0, 5.5);
 
     void CustomUpdate() override {
         explosion.updateFireball(transform.getModelMatrix(), Blib::camera.getPosition());
