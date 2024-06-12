@@ -39,8 +39,8 @@ struct MyVertex {
 
 class MyMesh {
     std::vector<MyVertex> my_vertices;
-    std::vector<uint> my_indices;
-    std::vector<uint> my_indices_original;
+    std::vector<GLuint> my_indices;
+    std::vector<GLuint> my_indices_original;
 
     GLuint vao;
     GLuint vbo;
