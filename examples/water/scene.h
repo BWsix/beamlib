@@ -1,5 +1,6 @@
 #pragma once
 
+#include "loader.h"
 #include "models.h"
 #include "screen.h"
 #include "skybox.h"
@@ -16,6 +17,8 @@ struct WaterScene : Blib::Scene {
     Blib::ShaderProgram phong;
     Blib::ShaderProgram screenProgram;
 
+    Loader l;
+
     bool fresnel_test = false;
 
     void setup() override {
@@ -28,6 +31,8 @@ struct WaterScene : Blib::Scene {
     }
 
     void init() override {
+        l.init();
+
         water.transform.Scale({5, 1, 5});
         water.transform.Translate({0, -1, 0});
 
@@ -52,6 +57,8 @@ struct WaterScene : Blib::Scene {
         WaterDemo::Ball::LoadResources();
         WaterDemo::Dragon::LoadResources();
         WaterDemo::Torus::LoadResources();
+
+        Loader::LoadResources();
     }
 
     void render() override {
@@ -86,10 +93,12 @@ struct WaterScene : Blib::Scene {
                     }
                     torus.transform.Translate({0, 0, 200});
                 } else {
-                    dragon.render(phong);
+                    l.renderSavedMeshes(dragon.transform.getModelMatrix(), true);
+                    // dragon.render(phong);
                 }
             }
             phong.SetBool("reflectionMode", false);
+
 
             skybox.render();
         }
@@ -109,7 +118,8 @@ struct WaterScene : Blib::Scene {
                 }
                 torus.transform.Translate({0, 0, 200});
             } else {
-                dragon.render(phong);
+                l.renderSavedMeshes(dragon.transform.getModelMatrix());
+                // dragon.render(phong);
             }
 
             skybox.render();
@@ -129,7 +139,8 @@ struct WaterScene : Blib::Scene {
                 }
                 torus.transform.Translate({0, 0, 200});
             } else {
-                dragon.render(phong);
+                l.renderSavedMeshes(dragon.transform.getModelMatrix());
+                // dragon.render(phong);
             }
 
             skybox.render();
